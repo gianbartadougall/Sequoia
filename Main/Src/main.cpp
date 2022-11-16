@@ -2,6 +2,7 @@
 
 /* Private Includes */
 #include "game.h"
+#include <glfw3.h>
 
 using namespace game;
 

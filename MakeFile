@@ -14,7 +14,8 @@ CPP_SOURCE_DIRS = \
 Engine/Math/Src \
 Main/Src
 
-vpath %.cpp $(CPP_SOURCE_DIRS)
+OPENGL_INCLUDES = \
+-IDrivers\OpenGL\include\GLFW
 
 C_EXCLUDES = \
 Engine/Math/Src/vector4f.cpp
@@ -44,7 +45,7 @@ CC=g++
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-CFLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+CFLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) $(OPENGL_INCLUDES)
 
 # Build the dependency $(TARGET)
 all: $(BUILD_DIR) $(EXECUTABLE)
@@ -53,10 +54,11 @@ all: $(BUILD_DIR) $(EXECUTABLE)
 # are saved in a different file so the linking is done seperatley
 $(EXECUTABLE): $(OBJECTS) Linker
 
+#	$(CC) -o $(EXECUTABLE) $^
+
 # Recipe to link all the .o files together and create the executable
 Linker: $(OBJECTS_NO_DIR)
 	$(CC) -o $(EXECUTABLE) $^
-#	$(info $(OBJECTS_NO_DIR))
 
 # Delete build directory
 clean:
