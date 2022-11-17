@@ -1,11 +1,6 @@
 @echo off
 
-:: bmake PROJECT_ARG ADDITONAL_ARG
-set logFile=logfile.txt
-set errFile=errFile.txt
-
 set num=0
-set error=0
 set verboseFlag=-v
 set verbose=0
 
@@ -52,8 +47,7 @@ if %num%==3 (
         if "%verbose%"=="1" (
             make %1
         ) else (
-            :: Underscore between args 2 and 3 to call appropriate sub recipe
-            make %1_%2 > NUL
+            call :secondArg %1 %2
         )
 
         goto :exit
@@ -61,10 +55,21 @@ if %num%==3 (
 
     :: Num args == 3 -> Running sub recipe of project (i.e run, clean) in verbose mode
     if %num%==3 (
-        make %1_%2 > NUL
+        call :secondArg %1 %2
         goto :exit
     )
 
 :exit
     EXIT /b
 
+:secondArg
+
+    :: Underscore between args 2 and 3 to call appropriate sub recipe
+    if "%2"=="run" (
+        :: Don't redirect output otherwise print statements won't appear in console
+        make %1_%2    
+    ) else (
+        make %1_%2 > NUL
+    )
+
+    goto :eof
