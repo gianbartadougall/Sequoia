@@ -15,10 +15,11 @@
 
 /* Private Includes */
 #include "game.h"
-// #include "matrix4f.h"
+
+/* OpenGL Includes */
+#include "glfw.h"
 
 using namespace game;
-// using namespace matrix4f;
 using namespace std::chrono;
 
 /* Private Function Declartations */
@@ -34,14 +35,13 @@ Game::~Game() {
 void Game::run() {
 
     // Creating a new matrix testing
-    // Matrix4f m1, m2;
-    // m1.scale(2);
-    // m2.scale(3);
-    // m1.multiply(&m2);
-    // m1.print();
 
     int frames = 0;
     system_clock::time_point time1 = system_clock::now();
+
+    // Create the window for the game
+    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+
     // Create a game loop
     while (1) {
 
