@@ -4,44 +4,47 @@
 set logFile=logfile.txt
 
 set num=0
+set error=0
 for %%x in (%*) do Set /A num+=1
+
+:: If no arguments are passed, compile all
+if %num%==0 (
+    make all > %logfile% 2>&1
+    set error=%ERRORLEVEL%
+)
 
 if %num%==1 (
     make %1 > %logfile% 2>&1
-    :: Check error code
-    if not %ERRORLEVEL%==0 (
-        type %logFile%
-    )
+    set error=%ERRORLEVEL%
 )
 
 if %num%==2 (
 
     if "%2"=="clean" (
         make %1_clean > %logFile% 2>&1 
+        set error=%ERRORLEVEL%
 
-        :: Check error code
-        if not %ERRORLEVEL%==0 (
-            type %logFile%
-        )
-
-        call :EXIT
+        goto :end
     )
 
     if "%2"=="run" (
-        make %1_run > %logFile%
-        make %1_clean > %logFile% 2>&1 
+        make %1_run 2> %logFile%
+        set error=%ERRORLEVEL%
 
-        :: Check error code
-        if not %ERRORLEVEL%==0 (
-            type %logFile%
-        )
-        call :EXIT
+        goto :end
     )
         
     echo That input was invalid
-    del /f %logFile% > NUL 2>&1
 )
 
+:end
 
-:EXIT
+if not %error%==0 (
+    type %logFile%
+)
+
+:: Delete the log file if it exists
+del /f %logFile% > NUL 2>&1
+
+:exit
     EXIT /b

@@ -11,11 +11,14 @@ hayden:
 hayden_clean:
 	$(MAKE) clean -C HSandBox
 
+hayden_run:
+	$(MAKE) run -C HSandBox
+
 gian:
 	$(MAKE) -C GSandBox
 
 gian_clean:
 	$(MAKE) clean -C GSandBox
 
-clean:
-
+gian_run:
+	$(MAKE) run -C GSandBox
