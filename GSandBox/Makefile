@@ -10,17 +10,23 @@ EXECUTABLE = $(BUILD_DIR)/$(EXECUTABLE_NAME).exe
 
 CPP_SOURCE_DIRS = \
 ../Engine/Math/Src \
-Main/Src
+../Engine/Utils/Src \
+Main/Src \
+Utils/Src
 
-C_OBJECTS_DIR = ../Drivers/dependencies
+GLFW_BUILD_DIRECTORY = ../Drivers/GLFW/build
+GLEW_BUILD_DIRECTORY = ../Drivers/GLEW/build
 
-GLEW_OBJECTS_DIR = ../Drivers/GLEW/build
+GLFW_OBJECTS = $(foreach D, $(GLFW_BUILD_DIRECTORY), $(wildcard $(D)/*.o))
+GLEW_OBJECTS = $(foreach D, $(GLEW_BUILD_DIRECTORY), $(wildcard $(D)/*.o))
 
-CPP_INCLUDES = \
--IMain/Inc \
--I../Drivers/GLFW/include \
--I../Engine/Math/Inc \
--I../Drivers/GLFW/src
+GLFW_INCLUDES = -I../Drivers/GLFW/include -I../Drivers/GLFW/src
+GLEW_INCLUDES = -I../Drivers/GLEW/include
+
+# Generate list of includes for .cpp files based on the .cpp sources
+CPP_INCLUDES = $(patsubst %/Src, -I%/Inc, $(CPP_SOURCE_DIRS))
+CPP_INCLUDES += $(GLEW_INCLUDES)
+CPP_INCLUDES += $(GLFW_INCLUDES)
 
 CPP_EXCLUDES = \
 ../Engine/Math/Src/vector4f.cpp
@@ -31,9 +37,6 @@ CPP_SOURCES = $(filter-out $(CPP_EXCLUDES),$(CPP_SOURCES_ALL))
 CPP_OBJECTS = $(patsubst %.cpp, %.o, $(CPP_SOURCES))
 CPP_OBJECTS_NO_DIR = $(foreach D, $(CPP_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
 
-C_OBJECTS = $(foreach D, $(C_OBJECTS_DIR), $(wildcard $(D)/*.o))
-GLEW_OBJECTS = $(foreach D, $(GLEW_OBJECTS_DIR), $(wildcard $(D)/*.o))
-
 # Create list of dependcy files (.d files). These files are used by the
 # compiler to ensure that any .cpp file that includes a .h file that has
 # changed is recompiled
@@ -42,8 +45,6 @@ CPP_DEPENDENCIES = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(CPP_SOURCES))
 
 # Optimisation flags
 OPT = -Og
-
-# Compile using g++ (compiler for c++)
 CPP_COMPILER=g++
 
 # Ensures .cpp files are recompiled if header files are edited 
@@ -59,7 +60,7 @@ all: $(BUILD_DIR) $(EXECUTABLE)
 $(EXECUTABLE): $(CPP_OBJECTS) Linker
 
 # Recipe to link all the .o files together and create the executable
-Linker: $(CPP_OBJECTS_NO_DIR) $(C_OBJECTS) $(GLEW_OBJECTS)
+Linker: $(CPP_OBJECTS_NO_DIR) $(GLFW_OBJECTS) $(GLEW_OBJECTS)
 	$(CPP_COMPILER) -o $(EXECUTABLE) $^ -lgdi32 -lopengl32
 
 # Delete build directory

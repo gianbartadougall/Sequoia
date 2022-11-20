@@ -11,18 +11,19 @@
 /* Public Includes */
 #include <iostream>
 #include <chrono> // Required for getting system time
-// #include <ctime>
+#include <string>
 #include <cmath>
 
 /* Private Includes */
 #include "game.h"
+#include "fileHandler.h"
 
 /* GLEW Includes. This must be included before GLFW includes */
 #define GLEW_STATIC
 #include <GL/glew.h>
 
 /* GLFW Includes */
-#include "glfw_config.h"
+// #include "glfw_config.h"
 #include <GLFW/glfw3.h>
 
 using namespace game;
@@ -31,7 +32,7 @@ using namespace std::chrono;
 /* Private variable Declarations */
 GLFWwindow* window;
 
-// Shader sources
+// // Shader sources
 const GLchar* vertexSource   = R"glsl(
     #version 150 core
     in vec2 position;
@@ -60,6 +61,15 @@ Game::Game() {
 Game::~Game() {}
 
 void Game::run() {
+
+    fileHandler::FileHandler fh;
+    char path[] = "Shaders/vertex_shader.glsl";
+    std::string fileData;
+    fh.read_text_file(path, fileData);
+
+    std::cout << "FILE DATA: " << fileData << "\n";
+
+    return;
 
     if (glfwInit() != GLFW_TRUE) {
         std::cout << "GLFW could not be initialised" << std::endl;

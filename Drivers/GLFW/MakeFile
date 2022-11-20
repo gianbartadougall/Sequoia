@@ -4,35 +4,28 @@
 # for external dependencies so they can be linked together with internal
 # .cpp files
 
-BUILD_DIR = dependencies
+BUILD_DIR = build
 
-GLFW_SOURCES = \
-GLFW/src/monitor.c \
-GLFW/src/window.c \
-GLFW/src/win32_monitor.c \
-GLFW/src/win32_window.c \
-GLFW/src/init.c \
-GLFW/src/input.c \
-GLFW/src/context.c \
-GLFW/src/win32_init.c \
-GLFW/src/win32_thread.c \
-GLFW/src/win32_time.c \
-GLFW/src/win32_joystick.c \
-GLFW/src/wgl_context.c \
-GLFW/src/egl_context.c \
-GLFW/src/osmesa_context.c \
-GLFW/src/vulkan.c
-
-GLEW_SOURCES = \
-GLEW/src/glew.c
-
-C_SOURCES += $(GLFW_SOURCES)
-C_SOURCES += $(GLEW_SOURCES)
+C_SOURCES = \
+src/monitor.c \
+src/window.c \
+src/win32_monitor.c \
+src/win32_window.c \
+src/init.c \
+src/input.c \
+src/context.c \
+src/win32_init.c \
+src/win32_thread.c \
+src/win32_time.c \
+src/win32_joystick.c \
+src/wgl_context.c \
+src/egl_context.c \
+src/osmesa_context.c \
+src/vulkan.c
 
 C_INCLUDES = \
--IGLFW/include \
--IGLFW/src \
--IGLEW/include \
+-Iinclude \
+-Isrc
 
 # Create list of all the object files (.o files)
 C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
@@ -48,8 +41,6 @@ C_DEPENDENCIES = $(patsubst %.c, $(BUILD_DIR)/%.d, $(C_SOURCES))
 
 # Optimisation flags
 OPT = -Og
-
-# Compile using g++ (compiler for c++)
 CC=gcc
 
 # Ensures .cpp files are recompiled if header files are edited 
