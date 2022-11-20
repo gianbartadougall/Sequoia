@@ -2,16 +2,17 @@
 
 /* Private Includes */
 #include "game.h"
-#include <glfw3.h>
 
 using namespace game;
 
+int hello(void);
+
 int main(void) {
 
-    std::cout << "This is a test!!!" << std::endl;
+    std::cout << "The number is " << hello() << std::endl;
 
-    Game game;
-    game.run();
+    // Game game;
+    // game.run();
     
     return 0;
 

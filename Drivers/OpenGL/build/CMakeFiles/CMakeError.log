@@ -1,0 +1,38 @@
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Gian/Desktop/home/Software_Projects/Sequoia/Drivers/OpenGL/build/CMakeFiles/CMakeScratch/TryCompile-d57hrh
+
+Run Build Command(s):C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_5a1ec/fast && C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_5a1ec.dir\build.make CMakeFiles/cmTC_5a1ec.dir/build
+mingw32-make[1]: Entering directory 'C:/Users/Gian/Desktop/home/Software_Projects/Sequoia/Drivers/OpenGL/build/CMakeFiles/CMakeScratch/TryCompile-d57hrh'
+Building C object CMakeFiles/cmTC_5a1ec.dir/CMakeCCompilerABI.c.obj
+C:\PROGRA~1\LLVM\bin\clang.exe   -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -MD -MT CMakeFiles/cmTC_5a1ec.dir/CMakeCCompilerABI.c.obj -MF CMakeFiles\cmTC_5a1ec.dir\CMakeCCompilerABI.c.obj.d -o CMakeFiles\cmTC_5a1ec.dir\CMakeCCompilerABI.c.obj -c "C:\Program Files\CMake\share\cmake-3.25\Modules\CMakeCCompilerABI.c"
+Linking C executable cmTC_5a1ec.exe
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_5a1ec.dir\link.txt --verbose=1
+C:\PROGRA~1\LLVM\bin\clang.exe -fuse-ld=lld-link -nostartfiles -nostdlib -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -Xlinker /subsystem:console @CMakeFiles\cmTC_5a1ec.dir\objects1 -o cmTC_5a1ec.exe -Xlinker /MANIFEST:EMBED -Xlinker /implib:cmTC_5a1ec.lib -Xlinker /pdb:C:\Users\Gian\Desktop\home\Software_Projects\Sequoia\Drivers\OpenGL\build\CMakeFiles\CMakeScratch\TryCompile-d57hrh\cmTC_5a1ec.pdb -Xlinker /version:0.0  
+lld-link: error: could not open 'msvcrtd.lib': no such file or directory
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+mingw32-make[1]: *** [CMakeFiles\cmTC_5a1ec.dir\build.make:100: cmTC_5a1ec.exe] Error 1
+mingw32-make[1]: Leaving directory 'C:/Users/Gian/Desktop/home/Software_Projects/Sequoia/Drivers/OpenGL/build/CMakeFiles/CMakeScratch/TryCompile-d57hrh'
+mingw32-make: *** [Makefile:126: cmTC_5a1ec/fast] Error 2
+
+
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: C:/Users/Gian/Desktop/home/Software_Projects/Sequoia/Drivers/OpenGL/build/CMakeFiles/CMakeScratch/TryCompile-vlpv6t
+
+Run Build Command(s):C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_0a376/fast && C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_0a376.dir\build.make CMakeFiles/cmTC_0a376.dir/build
+mingw32-make[1]: Entering directory 'C:/Users/Gian/Desktop/home/Software_Projects/Sequoia/Drivers/OpenGL/build/CMakeFiles/CMakeScratch/TryCompile-vlpv6t'
+Building C object CMakeFiles/cmTC_0a376.dir/testCCompiler.c.obj
+C:\PROGRA~1\LLVM\bin\clang.exe   -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -MD -MT CMakeFiles/cmTC_0a376.dir/testCCompiler.c.obj -MF CMakeFiles\cmTC_0a376.dir\testCCompiler.c.obj.d -o CMakeFiles\cmTC_0a376.dir\testCCompiler.c.obj -c C:\Users\Gian\Desktop\home\Software_Projects\Sequoia\Drivers\OpenGL\build\CMakeFiles\CMakeScratch\TryCompile-vlpv6t\testCCompiler.c
+Linking C executable cmTC_0a376.exe
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_0a376.dir\link.txt --verbose=1
+C:\PROGRA~1\LLVM\bin\clang.exe -fuse-ld=lld-link -nostartfiles -nostdlib -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -Xlinker /subsystem:console @CMakeFiles\cmTC_0a376.dir\objects1 -o cmTC_0a376.exe -Xlinker /MANIFEST:EMBED -Xlinker /implib:cmTC_0a376.lib -Xlinker /pdb:C:\Users\Gian\Desktop\home\Software_Projects\Sequoia\Drivers\OpenGL\build\CMakeFiles\CMakeScratch\TryCompile-vlpv6t\cmTC_0a376.pdb -Xlinker /version:0.0  @CMakeFiles\cmTC_0a376.dir\linkLibs.rsp 
+lld-link: error: could not open 'oldnames.lib': no such file or directory
+lld-link: error: could not open 'msvcrtd.lib': no such file or directory
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+mingw32-make[1]: *** [CMakeFiles\cmTC_0a376.dir\build.make:101: cmTC_0a376.exe] Error 1
+mingw32-make[1]: Leaving directory 'C:/Users/Gian/Desktop/home/Software_Projects/Sequoia/Drivers/OpenGL/build/CMakeFiles/CMakeScratch/TryCompile-vlpv6t'
+mingw32-make: *** [Makefile:126: cmTC_0a376/fast] Error 2
+
+
+

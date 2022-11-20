@@ -1,0 +1,66 @@
+# -*- MakeFile -*-
+
+# The purpose of this makefile is compile all the required .o files
+# for external dependencies so they can be linked together with internal
+# .cpp files
+
+BUILD_DIR = build
+
+C_SOURCE_DIRS = \
+OpenGL/src
+
+C_INCLUDES = \
+-IOpenGL/include
+
+# List all the .cpp files to be compiled
+# C_SOURCES_ALL = $(foreach D, $(C_SOURCE_DIRS), $(wildcard $(D)/*.c))
+
+# Filter out any source files that do not need be compiled
+# C_SOURCES = $(filter-out $(C_EXCLUDES),$(C_SOURCES_ALL))
+C_SOURCES = \
+Drivers/OpenGL/src/monitor.c
+
+# Create list of all the object files (.o files)
+C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
+
+# Create list of all the objects without the directo
+C_OBJECTS_NO_DIR = $(foreach D, $(C_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+
+# Create list of dependcy files (.d files). These files are used by the
+# compiler to ensure that any .cpp file that includes a .h file that has
+# changed is recompiled
+C_DEPENDENCIES = $(patsubst %.c, $(BUILD_DIR)/%.d, $(C_SOURCES))
+-include $(C_DEPENDENCIES)
+
+# Optimisation flags
+OPT = -Og
+
+# Compile using g++ (compiler for c++)
+CC=gcc
+
+# Ensures .cpp files are recompiled if header files are edited 
+DEPENDENCY_FLAGS = -MP -MD
+
+C_FLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+
+# Build the dependency $(TARGET)
+all: $(BUILD_DIR) $(C_OBJECTS)
+	$(info COMPILED)
+
+# Delete build directory
+clean:
+	@rmdir /s /q $(BUILD_DIR)
+
+# Run executable
+run:
+	.\$(EXECUTABLE)
+
+# Generic recipe for making .o files from .c files
+%.o:%.c
+	$(CC) $(C_FLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
+
+# Recipe to create build folder
+$(BUILD_DIR):
+	mkdir $@
+
+.PHONY: all run clean

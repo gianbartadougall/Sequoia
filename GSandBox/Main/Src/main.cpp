@@ -2,7 +2,10 @@
 
 /* Private Includes */
 #include "game.h"
-#include <glfw3.h>
+
+/* OpenGL Includes */
+#include "glfw_config.h"
+#include <GLFW/glfw3.h>
 
 using namespace game;
 
