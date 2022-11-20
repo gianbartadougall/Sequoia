@@ -4,26 +4,33 @@
 # for external dependencies so they can be linked together with internal
 # .cpp files
 
-BUILD_DIR = build
+BUILD_DIR = dependencies
 
-C_SOURCE_DIRS = \
-OpenGL/src
+C_SOURCES = \
+OpenGL/src/monitor.c \
+OpenGL/src/window.c \
+OpenGL/src/win32_monitor.c \
+OpenGL/src/win32_window.c \
+OpenGL/src/init.c \
+OpenGL/src/input.c \
+OpenGL/src/context.c \
+OpenGL/src/win32_init.c \
+OpenGL/src/win32_thread.c \
+OpenGL/src/win32_time.c \
+OpenGL/src/win32_joystick.c \
+OpenGL/src/wgl_context.c \
+OpenGL/src/egl_context.c \
+OpenGL/src/osmesa_context.c \
+OpenGL/src/vulkan.c
 
 C_INCLUDES = \
--IOpenGL/include
-
-# List all the .cpp files to be compiled
-# C_SOURCES_ALL = $(foreach D, $(C_SOURCE_DIRS), $(wildcard $(D)/*.c))
-
-# Filter out any source files that do not need be compiled
-# C_SOURCES = $(filter-out $(C_EXCLUDES),$(C_SOURCES_ALL))
-C_SOURCES = \
-Drivers/OpenGL/src/monitor.c
+-IOpenGL/include \
+-IOpenGL/src
 
 # Create list of all the object files (.o files)
 C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
 
-# Create list of all the objects without the directo
+# Create list of all the objects without the directory
 C_OBJECTS_NO_DIR = $(foreach D, $(C_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
 
 # Create list of dependcy files (.d files). These files are used by the
@@ -45,15 +52,10 @@ C_FLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
 
 # Build the dependency $(TARGET)
 all: $(BUILD_DIR) $(C_OBJECTS)
-	$(info COMPILED)
 
 # Delete build directory
 clean:
 	@rmdir /s /q $(BUILD_DIR)
-
-# Run executable
-run:
-	.\$(EXECUTABLE)
 
 # Generic recipe for making .o files from .c files
 %.o:%.c
