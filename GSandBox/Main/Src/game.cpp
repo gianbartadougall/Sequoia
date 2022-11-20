@@ -12,6 +12,7 @@
 #include <iostream>
 #include <chrono> // Required for getting system time
 // #include <ctime>
+#include <cmath>
 
 /* Private Includes */
 #include "game.h"
@@ -30,6 +31,25 @@ using namespace std::chrono;
 /* Private variable Declarations */
 GLFWwindow* window;
 
+// Shader sources
+const GLchar* vertexSource   = R"glsl(
+    #version 150 core
+    in vec2 position;
+    void main()
+    {
+        gl_Position = vec4(position, 0.0, 1.0);
+    }
+)glsl";
+const GLchar* fragmentSource = R"glsl(
+    #version 150 core
+    uniform vec3 triangleColor;
+    out vec4 outColor;
+    void main()
+    {
+        outColor = vec4(triangleColor, 1.0);
+    }
+)glsl";
+
 /* Private Function Declartations */
 void error_callback(int error, const char* description);
 
@@ -46,15 +66,19 @@ void Game::run() {
         return;
     }
 
-    window = glfwCreateWindow(1920, 1080, "Sequoia", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Sequoia", NULL, NULL);
     if (window == NULL) {
         std::cout << "Window could not be created" << std::endl;
         glfwTerminate();
         return;
     }
 
-    /* Make the window's context current */
+    // Make the window's context current. This must happen before glew init
     glfwMakeContextCurrent(window);
+
+    if (glewInit() != GLEW_OK) {
+        std::cout << "GLEW FAILED" << std::endl;
+    }
 
     int frames                     = 0;
     system_clock::time_point time1 = system_clock::now();
@@ -69,7 +93,12 @@ void Game::run() {
         -0.5f, -0.5f  // Vertex 3 (X, Y)
     };
 
-    // Create vertex buffer object. This
+    // Creating the VAO needs to be at the start of your program!!
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    // // Create vertex buffer object. This
     GLuint vbo;
     glGenBuffers(1, &vbo); // Generate 1 buffer
 
@@ -80,59 +109,33 @@ void Game::run() {
     // is currently active
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    const char* vertexSource = R"glsl(
-    #version 150 core
-
-    in vec2 position;
-
-    void main()
-    {
-        gl_Position = vec4(position, 0.0, 1.0);
-    }
-    )glsl";
-
-    const char* fragmentSource = R"glsl(
-    #version 150 core
-
-    in vec2 position;
-
-    void main()
-    {
-        outColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-    )glsl";
-
+    // // Create vertex shader object and add shader to vertices
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
-
     glCompileShader(vertexShader);
 
+    // Create fragment shader object and add shader to vertices
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
     glCompileShader(fragmentShader);
 
+    // Connect the vertex and fragment shader together so all the data
+    // from the vertex shader goes to the fragment shader
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
+    // glBindFragDataLocation(shaderProgram, 0, "outColor");
 
-    glBindFragDataLocation(shaderProgram, 0, "outColor");
-
+    // Linking the shader program required for connect to occur
     glLinkProgram(shaderProgram);
-
     glUseProgram(shaderProgram);
 
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
     glEnableVertexAttribArray(posAttrib);
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-
-    glBindVertexArray(vao);
-
     /****** END CODE BLOCK ******/
+    float count = 0.0f;
 
     // Run main game loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
@@ -154,14 +157,24 @@ void Game::run() {
             time1  = system_clock::now();
         }
 
+        count += 0.0001f;
+        GLint uniColor = glGetUniformLocation(shaderProgram, "triangleColor");
+        glUniform3f(uniColor, 1.0f, 0.0f, 0.0f);
+        glUniform3f(uniColor, (sin(count * 4.0f) + 1.0f) / 2.0f, 0.0f, 0.0f);
+
         frames++;
     }
 
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &vao);
     glfwTerminate();
 }
 
 void Game::render() {
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glClearColor(0.6f, 0.6f, 0.2f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear screen to black
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3); // Draw triangle
 }

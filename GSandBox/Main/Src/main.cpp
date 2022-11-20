@@ -11,11 +11,8 @@ using namespace game;
 
 int main(void) {
 
-    std::cout << "This is a test!!!" << std::endl;
-
     Game game;
     game.run();
-    
-    return 0;
 
+    return 0;
 }

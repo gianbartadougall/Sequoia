@@ -7,21 +7,21 @@
 BUILD_DIR = dependencies
 
 GLFW_SOURCES = \
-# GLFW/src/monitor.c \
-# GLFW/src/window.c \
-# GLFW/src/win32_monitor.c \
-# GLFW/src/win32_window.c \
-# GLFW/src/init.c \
-# GLFW/src/input.c \
-# GLFW/src/context.c \
-# GLFW/src/win32_init.c \
-# GLFW/src/win32_thread.c \
-# GLFW/src/win32_time.c \
-# GLFW/src/win32_joystick.c \
-# GLFW/src/wgl_context.c \
-# GLFW/src/egl_context.c \
-# GLFW/src/osmesa_context.c \
-# GLFW/src/vulkan.c
+GLFW/src/monitor.c \
+GLFW/src/window.c \
+GLFW/src/win32_monitor.c \
+GLFW/src/win32_window.c \
+GLFW/src/init.c \
+GLFW/src/input.c \
+GLFW/src/context.c \
+GLFW/src/win32_init.c \
+GLFW/src/win32_thread.c \
+GLFW/src/win32_time.c \
+GLFW/src/win32_joystick.c \
+GLFW/src/wgl_context.c \
+GLFW/src/egl_context.c \
+GLFW/src/osmesa_context.c \
+GLFW/src/vulkan.c
 
 GLEW_SOURCES = \
 GLEW/src/glew.c
