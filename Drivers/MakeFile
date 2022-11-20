@@ -6,26 +6,33 @@
 
 BUILD_DIR = dependencies
 
-C_SOURCES = \
-OpenGL/src/monitor.c \
-OpenGL/src/window.c \
-OpenGL/src/win32_monitor.c \
-OpenGL/src/win32_window.c \
-OpenGL/src/init.c \
-OpenGL/src/input.c \
-OpenGL/src/context.c \
-OpenGL/src/win32_init.c \
-OpenGL/src/win32_thread.c \
-OpenGL/src/win32_time.c \
-OpenGL/src/win32_joystick.c \
-OpenGL/src/wgl_context.c \
-OpenGL/src/egl_context.c \
-OpenGL/src/osmesa_context.c \
-OpenGL/src/vulkan.c
+GLFW_SOURCES = \
+# GLFW/src/monitor.c \
+# GLFW/src/window.c \
+# GLFW/src/win32_monitor.c \
+# GLFW/src/win32_window.c \
+# GLFW/src/init.c \
+# GLFW/src/input.c \
+# GLFW/src/context.c \
+# GLFW/src/win32_init.c \
+# GLFW/src/win32_thread.c \
+# GLFW/src/win32_time.c \
+# GLFW/src/win32_joystick.c \
+# GLFW/src/wgl_context.c \
+# GLFW/src/egl_context.c \
+# GLFW/src/osmesa_context.c \
+# GLFW/src/vulkan.c
+
+GLEW_SOURCES = \
+GLEW/src/glew.c
+
+C_SOURCES += $(GLFW_SOURCES)
+C_SOURCES += $(GLEW_SOURCES)
 
 C_INCLUDES = \
--IOpenGL/include \
--IOpenGL/src
+-IGLFW/include \
+-IGLFW/src \
+-IGLEW/include \
 
 # Create list of all the object files (.o files)
 C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))

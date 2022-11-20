@@ -14,16 +14,13 @@ Main/Src
 
 C_OBJECTS_DIR = ../Drivers/dependencies
 
-# C_INCLUDES = \
-# -I../Drivers/OpenGL/src \
-# -I../Drivers/OpenGL/include \
-# -I../Drivers/OpenGL/include/GLFW
+GLEW_OBJECTS_DIR = ../Drivers/GLEW/build
 
 CPP_INCLUDES = \
 -IMain/Inc \
--I../Drivers/OpenGL/include \
+-I../Drivers/GLFW/include \
 -I../Engine/Math/Inc \
--I../Drivers/OpenGL/src
+-I../Drivers/GLFW/src
 
 CPP_EXCLUDES = \
 ../Engine/Math/Src/vector4f.cpp
@@ -34,47 +31,25 @@ CPP_SOURCES = $(filter-out $(CPP_EXCLUDES),$(CPP_SOURCES_ALL))
 CPP_OBJECTS = $(patsubst %.cpp, %.o, $(CPP_SOURCES))
 CPP_OBJECTS_NO_DIR = $(foreach D, $(CPP_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
 
-# Compile all the required .c sources and associated directories
-# C_SOURCES = \
-# ../Drivers/OpenGL/src/monitor.c \
-# ../Drivers/OpenGL/src/window.c \
-# ../Drivers/OpenGL/src/win32_monitor.c \
-# ../Drivers/OpenGL/src/win32_window.c \
-# ../Drivers/OpenGL/src/init.c \
-# ../Drivers/OpenGL/src/input.c \
-# ../Drivers/OpenGL/src/context.c \
-# ../Drivers/OpenGL/src/win32_init.c \
-# ../Drivers/OpenGL/src/win32_thread.c \
-# ../Drivers/OpenGL/src/win32_time.c \
-# ../Drivers/OpenGL/src/win32_joystick.c \
-# ../Drivers/OpenGL/src/wgl_context.c \
-# ../Drivers/OpenGL/src/egl_context.c \
-# ../Drivers/OpenGL/src/osmesa_context.c \
-# ../Drivers/OpenGL/src/vulkan.c
-# C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
-
 C_OBJECTS = $(foreach D, $(C_OBJECTS_DIR), $(wildcard $(D)/*.o))
+GLEW_OBJECTS = $(foreach D, $(GLEW_OBJECTS_DIR), $(wildcard $(D)/*.o))
 
 # Create list of dependcy files (.d files). These files are used by the
 # compiler to ensure that any .cpp file that includes a .h file that has
 # changed is recompiled
 CPP_DEPENDENCIES = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(CPP_SOURCES))
-# C_DEPENDENCIES = $(patsubst %.c, $(BUILD_DIR)/%.d, $(C_SOURCES))
 -include $(CPP_DEPENDENCIES)
-# -include $(C_DEPENDENCIES)
 
 # Optimisation flags
 OPT = -Og
 
 # Compile using g++ (compiler for c++)
-# C_COMPILER=gcc
 CPP_COMPILER=g++
 
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-CPP_FLAGS = -Wall $(CPP_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
-# C_FLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+CPP_FLAGS = -Wall $(CPP_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) -I../Drivers/GLEW/include
 
 # Build the dependency $(TARGET)
 all: $(BUILD_DIR) $(EXECUTABLE)
@@ -84,8 +59,8 @@ all: $(BUILD_DIR) $(EXECUTABLE)
 $(EXECUTABLE): $(CPP_OBJECTS) Linker
 
 # Recipe to link all the .o files together and create the executable
-Linker: $(CPP_OBJECTS_NO_DIR) $(C_OBJECTS)
-	$(CPP_COMPILER) -o $(EXECUTABLE) $(OPENGL_DLL_SOURCES) $^ -lgdi32 -lopengl32
+Linker: $(CPP_OBJECTS_NO_DIR) $(C_OBJECTS) $(GLEW_OBJECTS)
+	$(CPP_COMPILER) -o $(EXECUTABLE) $^ -lgdi32 -lopengl32
 
 # Delete build directory
 clean:
@@ -98,10 +73,6 @@ run:
 # Generic recipe for making .o files from .cpp files
 %.o:%.cpp
 	$(CPP_COMPILER) $(CPP_FLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
-
-# Generic recipe for making .o files from .c files
-# %.o:%.c
-# 	$(C_COMPILER) $(C_FLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
 
 # Recipe to create build folder
 $(BUILD_DIR):

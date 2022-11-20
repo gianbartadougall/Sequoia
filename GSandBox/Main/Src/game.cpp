@@ -16,7 +16,11 @@
 /* Private Includes */
 #include "game.h"
 
-/* OpenGL Includes */
+/* GLEW Includes. This must be included before GLFW includes */
+#define GLEW_STATIC
+#include <GL/glew.h>
+
+/* GLFW Includes */
 #include "glfw_config.h"
 #include <GLFW/glfw3.h>
 
@@ -31,7 +35,6 @@ void error_callback(int error, const char* description);
 
 Game::Game() {
     // Create the window for the game
-    // window = glfwCreateWindow(640, 480, "Sequoia", glfwGetPrimaryMonitor(), NULL);
 }
 
 Game::~Game() {}
@@ -55,6 +58,81 @@ void Game::run() {
 
     int frames                     = 0;
     system_clock::time_point time1 = system_clock::now();
+
+    /****** START CODE BLOCK ******/
+    // Description: Testing rendering
+
+    // Create vertices of traingle to render
+    float vertices[] = {
+        0.0f,  0.5f,  // Vertex 1 (X, Y)
+        0.5f,  -0.5f, // Vertex 2 (X, Y)
+        -0.5f, -0.5f  // Vertex 3 (X, Y)
+    };
+
+    // Create vertex buffer object. This
+    GLuint vbo;
+    glGenBuffers(1, &vbo); // Generate 1 buffer
+
+    // Make the buffer that was just created active
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // Adding data to buffer doesn't depend on the id of the buffer but which buffer
+    // is currently active
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    const char* vertexSource = R"glsl(
+    #version 150 core
+
+    in vec2 position;
+
+    void main()
+    {
+        gl_Position = vec4(position, 0.0, 1.0);
+    }
+    )glsl";
+
+    const char* fragmentSource = R"glsl(
+    #version 150 core
+
+    in vec2 position;
+
+    void main()
+    {
+        outColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+    )glsl";
+
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexSource, NULL);
+
+    glCompileShader(vertexShader);
+
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+    glCompileShader(fragmentShader);
+
+    GLuint shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+
+    glBindFragDataLocation(shaderProgram, 0, "outColor");
+
+    glLinkProgram(shaderProgram);
+
+    glUseProgram(shaderProgram);
+
+    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+
+    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(posAttrib);
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+
+    glBindVertexArray(vao);
+
+    /****** END CODE BLOCK ******/
 
     // Run main game loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
@@ -83,6 +161,7 @@ void Game::run() {
 }
 
 void Game::render() {
-    glClearColor(0.6f, 0.6f, 0.2f, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glClearColor(0.6f, 0.6f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }

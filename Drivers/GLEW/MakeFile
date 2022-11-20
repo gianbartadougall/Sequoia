@@ -1,0 +1,23 @@
+
+BUILD_DIR = build
+
+C_SOURCES = \
+src/glew.c \
+src/glew_info.c \
+src/visualinfo.c
+
+C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
+
+C_INCLUDES = \
+-Iinclude/
+
+OPT = -Og
+CC = gcc
+C_FLAGS = -Wall -g -DGLEW_STATIC $(C_INCLUDES) $(OPT)
+
+all: $(C_OBJECTS)
+
+
+
+%.o:%.c
+	$(CC) $(C_FLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
