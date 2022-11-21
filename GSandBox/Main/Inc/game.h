@@ -18,7 +18,7 @@ namespace game {
 	class Game {
 
 		// Private variables
-		void render(float mat[16], GLuint vbo);
+		void render();
 
 		public:
 		Game();

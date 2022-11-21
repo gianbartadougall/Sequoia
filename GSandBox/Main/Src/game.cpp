@@ -92,25 +92,24 @@ void Game::run() {
 		-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f  // Bottom-left (x, y, z, r, g, b)
 	};
 
-	float tMat[16] = {
-		1.0f, 0.0f, 0.0f, 0.0f, //
-		0.0f, 1.0f, 0.0f, 0.0f, //
-		0.0f, 0.0f, 1.0f, 0.0f, //
-		0.0f, 0.0f, 0.0f, 1.0f	//
-	};
+	// float tMatf[16] = {
+	// 	1.0f, 0.0f, 0.0f, 0.2f, //
+	// 	0.0f, 1.0f, 0.0f, 0.2f, //
+	// 	0.0f, 0.0f, 1.0f, 0.2f, //
+	// 	0.0f, 0.0f, 0.0f, 1.0f	//
+	// };
 
-	// vector4f::Vector4f translate(0, 0, 0);
-	// vector4f::Vector4f scale(1, 1, 1);
-	// vector4f::Vector4f rotate(0, 0, 0);
-	// matrix4f::Matrix4f tMat(translate, scale, rotate);
+	vector4f::Vector4f translate(0.0f, 0.0f, 0.0f);
+	vector4f::Vector4f scale(1, 1, 1);
+	vector4f::Vector4f rotate(0, 0, 0);
+	matrix4f::Matrix4f tMat(translate, scale, rotate);
+	translate.add(0.0001f, 0.0f, 0.0f);
+	tMat.print();
 
 	// Creating the VAO needs to be at the start of your program!!
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-
-	GLuint tMatvao;
-	glGenVertexArrays(1, &tMatvao);
 
 	// // Create vertex buffer object. This
 	GLuint vbo;
@@ -126,12 +125,6 @@ void Game::run() {
 	// is currently active
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	GLuint tMatvbo;
-	glGenBuffers(1, &tMatvbo); // Generate 1 buffer
-
-	glBindBuffer(GL_ARRAY_BUFFER, tMatvbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(tMat), tMat, GL_STATIC_DRAW);
 
 	// // Create vertex shader object and add shader to vertices
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -184,11 +177,8 @@ void Game::run() {
 	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
 	// Transformation matrix!!!
-
-	glBindVertexArray(tMatvao);
-	GLint transAttrib = glGetAttribLocation(shaderProgram, "transformation");
-	glEnableVertexAttribArray(transAttrib);
-	glVertexAttribPointer(transAttrib, 16, GL_FLOAT, GL_FALSE, 16 * sizeof(GLfloat), 0);
+	GLint uniTrans = glGetUniformLocation(shaderProgram, "transformation");
+	glUniformMatrix4fv(uniTrans, 1, GL_TRUE, tMat.m);
 
 	// When Drawing multiple triangles, it is saves memory if you can reuse vertices
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -199,12 +189,8 @@ void Game::run() {
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 
-		// tMat[3] += 0.0001f;
-		// tMat[7] += 0.0001f;
-		// tMat[11] += 0.0001f;
-
 		/* Render here */
-		render(tMat, tMatvbo);
+		render();
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -220,24 +206,23 @@ void Game::run() {
 			time1  = system_clock::now();
 		}
 
+		if ((elapsedTime.count() % 10) == 0) {
+			tMat.transform(translate, scale, rotate);
+			glUniformMatrix4fv(uniTrans, 1, GL_TRUE, tMat.m);
+		}
+
 		frames++;
 	}
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &tMatvbo);
 	glDeleteBuffers(1, &ebo);
 	glDeleteVertexArrays(1, &vao);
-	glDeleteVertexArrays(1, &tMatvao);
 	glfwTerminate();
 }
 
-void Game::render(float mat[16], GLuint vbo) {
-
-	// To update variable in vertex/fragment shader
-	// GLuint location = glGetUniformLocation(programHangle, "transformation");
-
+void Game::render() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear screen to black
 	glClear(GL_COLOR_BUFFER_BIT);
 

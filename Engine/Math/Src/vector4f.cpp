@@ -17,11 +17,17 @@ Vector4f::Vector4f(float xi, float yi, float zi) {
 	z = zi;
 }
 
-void Vector4f::add(Vector4f v) {
-	x += v.x;
-	y += v.y;
-	z += v.z;
+void Vector4f::add(float xi, float yi, float zi) {
+	x += xi;
+	y += yi;
+	z += zi;
 }
+
+// void Vector4f::add(Vector4f v) {
+// 	x += v.x;
+// 	y += v.y;
+// 	z += v.z;
+// }
 
 void Vector4f::subtract(Vector4f v) {
 	x -= v.x;

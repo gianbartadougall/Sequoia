@@ -14,7 +14,8 @@ namespace vector4f {
 		Vector4f(float x, float y, float z);
 		~Vector4f();
 
-		void add(Vector4f v);
+		// void add(Vector4f v);
+		void add(float xi, float yi, float zi);
 		void subtract(Vector4f v);
 		float dot(Vector4f v);
 	};

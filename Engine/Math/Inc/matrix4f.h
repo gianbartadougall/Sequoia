@@ -10,19 +10,20 @@ namespace matrix4f {
 
 		// Private variables go here
 		public:
-		float m[4][4];
+		float m[16];
 
 		// Public variables and functions go here
 		Matrix4f();
 		Matrix4f(Vector4f p, Vector4f s, Vector4f r);
 		~Matrix4f();
 
-		void scale(float scalar);
 		void print();
+		// void scale(float scalar);
 
-		void add(Matrix4f* m1);
-		void subtract(Matrix4f* m1);
+		// void add(Matrix4f* m1);
+		// void subtract(Matrix4f* m1);
 		void multiply(Matrix4f* m1);
+		void transform(Vector4f p, Vector4f s, Vector4f r);
 
 		protected:
 	};
