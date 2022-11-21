@@ -17,6 +17,8 @@ namespace game {
 
 		// Private variables
 
+		void render();
+
 		public:
 
 		Game();

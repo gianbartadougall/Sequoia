@@ -1,65 +1,67 @@
 # -*- MakeFile -*-
 
-# Create target name, build directory and executable path
+# Makefile settings
 EXECUTABLE_NAME = GianSandBox
+TARGET_SYSTEM = WINDOWS
+
+# Create target name, build directory and executable path
 BUILD_DIR = build
 EXECUTABLE = $(BUILD_DIR)/$(EXECUTABLE_NAME).exe
 
 CPP_SOURCE_DIRS = \
 ../Engine/Math/Src \
-Main/Src
+../Engine/Utils/Src \
+Main/Src \
+Utils/Src
 
-C_INCLUDES = \
--IMain/Inc \
--I../Engine/Math/Inc 
+GLFW_BUILD_DIRECTORY = ../Drivers/GLFW/build
+GLEW_BUILD_DIRECTORY = ../Drivers/GLEW/build
 
-# List all directories containg .h files used by the project
+GLFW_OBJECTS = $(foreach D, $(GLFW_BUILD_DIRECTORY), $(wildcard $(D)/*.o))
+GLEW_OBJECTS = $(foreach D, $(GLEW_BUILD_DIRECTORY), $(wildcard $(D)/*.o))
 
-C_EXCLUDES = \
+GLFW_INCLUDES = -I../Drivers/GLFW/include -I../Drivers/GLFW/src
+GLEW_INCLUDES = -I../Drivers/GLEW/include
+
+# Generate list of includes for .cpp files based on the .cpp sources
+CPP_INCLUDES = $(patsubst %/Src, -I%/Inc, $(CPP_SOURCE_DIRS))
+CPP_INCLUDES += $(GLEW_INCLUDES)
+CPP_INCLUDES += $(GLFW_INCLUDES)
+
+CPP_EXCLUDES = \
 ../Engine/Math/Src/vector4f.cpp
 
-OPENGL_INCLUDES = \
--I../Drivers/OpenGL/include/GLFW
-
-# List all the .cpp files to be compiled
-CPP_SOURCES_ALL = $(foreach D, $(CPP_SOURCE_DIRS), $(wildcard $(D)/*.cpp) )
-CPP_SOURCES = $(filter-out $(C_EXCLUDES),$(CPP_SOURCES_ALL))
-
-# Create list of all the object files (.o files)
-OBJECTS = $(patsubst %.cpp, %.o, $(CPP_SOURCES))
-
-# Create list of all the objects without the directo
-OBJECTS_NO_DIR = $(foreach D, $(OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+# Compile all the required .cpp sources and associated directories
+CPP_SOURCES_ALL = $(foreach D, $(CPP_SOURCE_DIRS), $(wildcard $(D)/*.cpp))
+CPP_SOURCES = $(filter-out $(CPP_EXCLUDES),$(CPP_SOURCES_ALL))
+CPP_OBJECTS = $(patsubst %.cpp, %.o, $(CPP_SOURCES))
+CPP_OBJECTS_NO_DIR = $(foreach D, $(CPP_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
 
 # Create list of dependcy files (.d files). These files are used by the
 # compiler to ensure that any .cpp file that includes a .h file that has
 # changed is recompiled
-DEPENDENCIES = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(CPP_SOURCES))
--include $(DEPENDENCIES)
+CPP_DEPENDENCIES = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(CPP_SOURCES))
+-include $(CPP_DEPENDENCIES)
 
 # Optimisation flags
 OPT = -Og
-
-# Compile using g++ (compiler for c++)
-CC=g++
+CPP_COMPILER=g++
 
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-CFLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) $(OPENGL_INCLUDES)
+CPP_FLAGS = -Wall $(CPP_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) -I../Drivers/GLEW/include
 
 # Build the dependency $(TARGET)
 all: $(BUILD_DIR) $(EXECUTABLE)
 
 # To build the executable, all the associated .o files are required. Because the .o files
 # are saved in a different file so the linking is done seperatley
-$(EXECUTABLE): $(OBJECTS) Linker
-
-#	$(CC) -o $(EXECUTABLE) $^
+$(EXECUTABLE): $(CPP_OBJECTS) Linker
 
 # Recipe to link all the .o files together and create the executable
-Linker: $(OBJECTS_NO_DIR)
-	$(CC) -o $(EXECUTABLE) $^
+Linker: $(CPP_OBJECTS_NO_DIR) $(GLFW_OBJECTS) $(GLEW_OBJECTS)
+	$(CPP_COMPILER) -o $(EXECUTABLE) $^ -lgdi32 -lopengl32
 
 # Delete build directory
 clean:
@@ -69,8 +71,9 @@ clean:
 run:
 	.\$(EXECUTABLE)
 
+# Generic recipe for making .o files from .cpp files
 %.o:%.cpp
-	$(CC) $(CFLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
+	$(CPP_COMPILER) $(CPP_FLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
 
 # Recipe to create build folder
 $(BUILD_DIR):

@@ -18,10 +18,6 @@ C_INCLUDES = \
 C_EXCLUDES = \
 ../Engine/Math/Src/vector4f.cpp
 
-OPENGL_INCLUDES = \
--I../Drivers/OpenGL/include/GLFW
-
-$(info TEST $(CPP_SOURCE_DIRS))
 # List all the .cpp files to be compiled
 CPP_SOURCES_ALL = $(foreach D, $(CPP_SOURCE_DIRS), $(wildcard $(D)/*.cpp) )
 CPP_SOURCES = $(filter-out $(C_EXCLUDES),$(CPP_SOURCES_ALL))
@@ -37,6 +33,7 @@ OBJECTS_NO_DIR = $(foreach D, $(OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
 # changed is recompiled
 DEPENDENCIES = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(CPP_SOURCES))
 -include $(DEPENDENCIES)
+
 # Optimisation flags
 OPT = -Og
 
@@ -46,7 +43,7 @@ CC=g++
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-CFLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) $(OPENGL_INCLUDES)
+CFLAGS = -Wall $(C_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
 
 # Build the dependency $(TARGET)
 all: $(BUILD_DIR) $(EXECUTABLE)
@@ -54,8 +51,6 @@ all: $(BUILD_DIR) $(EXECUTABLE)
 # To build the executable, all the associated .o files are required. Because the .o files
 # are saved in a different file so the linking is done seperatley
 $(EXECUTABLE): $(OBJECTS) Linker
-
-#	$(CC) -o $(EXECUTABLE) $^
 
 # Recipe to link all the .o files together and create the executable
 Linker: $(OBJECTS_NO_DIR)
