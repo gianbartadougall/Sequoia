@@ -62,14 +62,14 @@ Game::~Game() {}
 
 void Game::run() {
 
-    fileHandler::FileHandler fh;
-    char path[] = "Shaders/vertex_shader.glsl";
-    std::string fileData;
-    fh.read_text_file(path, fileData);
+    // fileHandler::FileHandler fh;
+    // char path[] = "Shaders/vertex_shader.glsl";
+    // std::string fileData;
+    // fh.read_text_file(path, fileData);
 
-    std::cout << "FILE DATA: " << fileData << "\n";
+    // std::cout << "FILE DATA: " << fileData << "\n";
 
-    return;
+    // return;
 
     if (glfwInit() != GLFW_TRUE) {
         std::cout << "GLFW could not be initialised" << std::endl;
