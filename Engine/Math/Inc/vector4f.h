@@ -1,23 +1,23 @@
 #ifndef VECTOR4F
 #define VECTOR4F
 
-using namespace vector4f {
+namespace vector4f {
 
-    class Vector4f {
+	class Vector4f {
 
-        public:
+		public:
+		float x;
+		float y;
+		float z;
 
-            float v[3];
+		Vector4f();
+		Vector4f(float x, float y, float z);
+		~Vector4f();
 
-            Vector4f();
-            ~Vector4f();
-
-            void add();
-            void subtract();
-            float dot();
-
-            void print();
-    } ;
-}
+		void add(Vector4f v);
+		void subtract(Vector4f v);
+		float dot(Vector4f v);
+	};
+} // namespace vector4f
 
 #endif // VECTOR4F

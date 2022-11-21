@@ -28,9 +28,6 @@ CPP_INCLUDES = $(patsubst %/Src, -I%/Inc, $(CPP_SOURCE_DIRS))
 CPP_INCLUDES += $(GLEW_INCLUDES)
 CPP_INCLUDES += $(GLFW_INCLUDES)
 
-CPP_EXCLUDES = \
-../Engine/Math/Src/vector4f.cpp
-
 # Compile all the required .cpp sources and associated directories
 CPP_SOURCES_ALL = $(foreach D, $(CPP_SOURCE_DIRS), $(wildcard $(D)/*.cpp))
 CPP_SOURCES = $(filter-out $(CPP_EXCLUDES),$(CPP_SOURCES_ALL))

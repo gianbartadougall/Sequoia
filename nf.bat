@@ -84,6 +84,10 @@ EXIT
 	call :bs %h%
 
 	:: Print includes. By default include stm32l4xx include
+	call :text %h% "/* GLEW Includes */"
+	call :bs %h%
+	call :text %h% "/* Private Includes */"
+	call :bs %h%
 	call :text %h% "namespace !fileName! {"
 	call :bs %h%
 	call :text %h% "	class  {"
@@ -111,4 +115,5 @@ EXIT
 	call :text %c% "/* Private Includes */"
 	call :text %c% "#include "!filename!.h""
 	call :bs %c%
+	call :text %c% "/* Private Macros */"
 	goto :eof
