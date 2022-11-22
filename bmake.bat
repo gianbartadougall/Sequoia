@@ -36,6 +36,14 @@ if %num%==3 (
             make
         ) else (
             make %1 > NUL
+            set el=%ERRORLEVEL%
+            :: If there was no error, run the program as well
+            if "%el%"=="0" (
+                echo RUNNING! because %el% == 0
+                make %1_run
+            ) else (
+                echo Did not run because %el% != 0
+            )
         )
 
         goto :exit
@@ -46,6 +54,13 @@ if %num%==3 (
     if %num%==2 (
         if "%verbose%"=="1" (
             make %1
+
+            if "%el%"=="0" (
+                echo RUNNING! because %el% == 0
+                make %1_run
+            ) else (
+                echo Did not run because %el% != 0
+            )
         ) else (
             call :secondArg %1 %2
         )
@@ -67,7 +82,7 @@ if %num%==3 (
     :: Underscore between args 2 and 3 to call appropriate sub recipe
     if "%2"=="run" (
         :: Don't redirect output otherwise print statements won't appear in console
-        make %1_%2    
+        make %1_%2
     ) else (
         make %1_%2 > NUL
     )
