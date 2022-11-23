@@ -15,6 +15,8 @@ namespace matrix4f {
 		// Public variables and functions go here
 		Matrix4f();
 		Matrix4f(Vector4f p, Vector4f s, Vector4f r);
+		Matrix4f(float a0, float a1, float a2, float a3, float a4, float a5, float a6, float a7, float a8, float a9,
+				 float a10, float a11, float a12, float a13, float a14, float a15);
 		~Matrix4f();
 
 		void print();

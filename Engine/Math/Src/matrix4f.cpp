@@ -96,6 +96,30 @@ Matrix4f::Matrix4f() {
 	m[15] = 1;
 }
 
+Matrix4f::Matrix4f(float a0, float a1, float a2, float a3, float a4, float a5, float a6, float a7, float a8, float a9,
+				   float a10, float a11, float a12, float a13, float a14, float a15) {
+
+	m[0] = a0;
+	m[1] = a1;
+	m[2] = a2;
+	m[3] = a3;
+
+	m[4] = a4;
+	m[5] = a5;
+	m[6] = a6;
+	m[7] = a7;
+
+	m[8]  = a8;
+	m[9]  = a9;
+	m[10] = a10;
+	m[11] = a11;
+
+	m[12] = a12;
+	m[13] = a13;
+	m[14] = a14;
+	m[15] = a15;
+}
+
 Matrix4f::Matrix4f(Vector4f p, Vector4f s, Vector4f r) {
 	m[0] = s.x;
 	m[1] = 0;

@@ -13,6 +13,7 @@
 #include <chrono> // Required for getting system time
 #include <string>
 #include <cmath>
+#include <windows.h>
 
 /** GLEW Includes. This must be included before GLFW includes. GLEW must
  * be included before GLFW includes. Including GLEW before private includes
@@ -75,6 +76,12 @@ Game::~Game() {
 
 void Game::run() {
 
+	// matrix4f::Matrix4f m2(1, 3, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	// matrix4f::Matrix4f m1(2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3);
+
+	// m2.multiply(&m1);
+	// m2.print();
+
 	shaderLoader::ShaderLoader sl;
 	GLchar* vertexSource   = sl.load_shader(vertexShaderPath);
 	GLchar* fragmentSource = sl.load_shader(fragmentShaderPath);
@@ -103,7 +110,6 @@ void Game::run() {
 	vector4f::Vector4f scale(1, 1, 1);
 	vector4f::Vector4f rotate(0, 0, 0);
 	matrix4f::Matrix4f tMat(translate, scale, rotate);
-	translate.add(0.0001f, 0.0f, 0.0f);
 	tMat.print();
 
 	// Creating the VAO needs to be at the start of your program!!
@@ -185,9 +191,43 @@ void Game::run() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
 	/****** END CODE BLOCK ******/
+	float distance = 0.001f;
 
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
+
+		// Handle key presses
+		if (GetKeyState('A') & 0x8000) {
+			// Move the object to the left
+			translate.set(-distance, 0, 0);
+			tMat.transform(translate, scale, rotate);
+			tMat.print();
+			translate.set(0, 0, 0);
+		}
+
+		if (GetKeyState('D') & 0x8000) {
+			// Move the object to the left
+			translate.set(distance, 0, 0);
+			tMat.transform(translate, scale, rotate);
+			tMat.print();
+			translate.set(0, 0, 0);
+		}
+
+		if (GetKeyState('W') & 0x8000) {
+			// Move the object to the left
+			scale.set(1.01f, 1.01f, 1.01f);
+			tMat.transform(translate, scale, rotate);
+			tMat.print();
+			scale.set(1, 1, 1);
+		}
+
+		if (GetKeyState('S') & 0x8000) {
+			// Move the object to the left
+			scale.set(0.99f, 0.99f, 0.99f);
+			tMat.transform(translate, scale, rotate);
+			tMat.print();
+			scale.set(1, 1, 1);
+		}
 
 		/* Render here */
 		render();
@@ -201,15 +241,12 @@ void Game::run() {
 		// Print the FPS
 		auto elapsedTime = duration_cast<milliseconds>(system_clock::now() - time1);
 		if (elapsedTime.count() >= 1000) {
-			std::cout << "FPS: " << frames << std::endl;
+			// std::cout << "FPS: " << frames << std::endl;
 			frames = 0;
 			time1  = system_clock::now();
 		}
 
-		if ((elapsedTime.count() % 10) == 0) {
-			tMat.transform(translate, scale, rotate);
-			glUniformMatrix4fv(uniTrans, 1, GL_TRUE, tMat.m);
-		}
+		glUniformMatrix4fv(uniTrans, 1, GL_TRUE, tMat.m);
 
 		frames++;
 	}

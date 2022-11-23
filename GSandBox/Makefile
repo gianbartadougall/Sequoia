@@ -1,64 +1,114 @@
 # -*- MakeFile -*-
 
 # Makefile settings
-EXECUTABLE_NAME = GianSandBox
-TARGET_SYSTEM = WINDOWS
+EXECUTABLE_NAME = GianSandBox.exe
 
 # Create target name, build directory and executable path
 BUILD_DIR = build
-EXECUTABLE = $(BUILD_DIR)/$(EXECUTABLE_NAME).exe
+EXECUTABLE = $(BUILD_DIR)/$(EXECUTABLE_NAME)
 
-CPP_SOURCE_DIRS = \
-../Engine/Math/Src \
-../Engine/Utils/Src \
-Main/Src \
-Utils/Src
+# Relative path to GLFW and GLEW sources from this makefile
+SEQUOIA_SUB_DIRS = $(wildcard ../Engine/*)
+PROJECT_SUB_DIRS = $(wildcard *)
+GLEW_DIRECTORY = ../Drivers/GLEW/src
+GLFW_DIRECTORY = ../Drivers/GLFW/src
 
-GLFW_BUILD_DIRECTORY = ../Drivers/GLFW/build
-GLEW_BUILD_DIRECTORY = ../Drivers/GLEW/build
+# Create list of .cpp sources for each folder
+SEQUOIA_SOURCES = $(strip $(foreach D, $(SEQUOIA_SUB_DIRS), $(wildcard $(D)/Src/*.cpp)))
+PROJECT_SOURCES = $(strip $(foreach D, $(PROJECT_SUB_DIRS), $(wildcard $(D)/Src/*.cpp)))
+GLEW_SOURCES = $(GLEW_DIRECTORY)/glew.c
+GLFW_SOURCES = $(patsubst %.c, $(GLFW_DIRECTORY)/%.c, monitor.c window.c win32_monitor.c win32_window.c init.c input.c context.c \
+win32_init.c win32_thread.c win32_time.c win32_joystick.c wgl_context.c egl_context.c osmesa_context.c vulkan.c)
 
-GLFW_OBJECTS = $(foreach D, $(GLFW_BUILD_DIRECTORY), $(wildcard $(D)/*.o))
-GLEW_OBJECTS = $(foreach D, $(GLEW_BUILD_DIRECTORY), $(wildcard $(D)/*.o))
+# Create list of .o files from .cpp and .c files
+SEQUOIA_OBJECTS = $(patsubst %.cpp, %.o, $(SEQUOIA_SOURCES))
+PROJECT_OBJECTS = $(patsubst %.cpp, %.o, $(PROJECT_SOURCES)) 
+GLFW_OBJECTS = $(patsubst %.c, %.o, $(GLFW_SOURCES))
+GLEW_OBJECTS = $(patsubst %.c, %.o, $(GLEW_SOURCES))
 
+# Create list of .o files with a stripped directory
+SEQUOIA_OBJECTS_BUILD_DIR = $(foreach D, $(SEQUOIA_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+PROJECT_OBJECTS_BUILD_DIR = $(foreach D, $(PROJECT_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+GLFW_OBJECTS_BUILD_DIR = $(foreach D, $(GLFW_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+GLEW_OBJECTS_BUILD_DIR = $(foreach D, $(GLEW_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+
+# Create list containing all the includes folders for the sequoia and project .cpp files.
+# patsubst adds -I to start of each folder and strip removes leading and trailing white space
+SEQUOIA_INCLUDE_FOLDERS = $(foreach D, $(SEQUOIA_SUB_DIRS), $(wildcard $(D)/Inc))
+PROJECT_INCLUDE_FOLDERS = $(foreach D, $(PROJECT_SUB_DIRS), $(wildcard $(D)/Inc))
+SEQUOIA_INCLUDES = $(strip $(patsubst %/Inc, -I%/Inc, $(SEQUOIA_INCLUDE_FOLDERS)))
+PROJECT_INCLUDES = $(strip $(patsubst %/Inc, -I%/Inc, $(PROJECT_INCLUDE_FOLDERS)))
+
+# Create list of .h includes for each folder in GLFW and GLEW folders
 GLFW_INCLUDES = -I../Drivers/GLFW/include -I../Drivers/GLFW/src
-GLEW_INCLUDES = -I../Drivers/GLEW/include
+GLEW_INCLUDES = -I../Drivers/GLEW/include 
 
-# Generate list of includes for .cpp files based on the .cpp sources
-CPP_INCLUDES = $(patsubst %/Src, -I%/Inc, $(CPP_SOURCE_DIRS))
-CPP_INCLUDES += $(GLEW_INCLUDES)
-CPP_INCLUDES += $(GLFW_INCLUDES)
-
-# Compile all the required .cpp sources and associated directories
-CPP_SOURCES_ALL = $(foreach D, $(CPP_SOURCE_DIRS), $(wildcard $(D)/*.cpp))
-CPP_SOURCES = $(filter-out $(CPP_EXCLUDES),$(CPP_SOURCES_ALL))
-CPP_OBJECTS = $(patsubst %.cpp, %.o, $(CPP_SOURCES))
-CPP_OBJECTS_NO_DIR = $(foreach D, $(CPP_OBJECTS), $(BUILD_DIR)/$(notdir $(D)))
+# Compile list containing all .cpp object and include files
+OBJECTS = $(SEQUOIA_OBJECTS) $(PROJECT_OBJECTS) $(GLFW_OBJECTS) $(GLEW_OBJECTS)
+INCLUDES = $(SEQUOIA_INCLUDES) $(PROJECT_INCLUDES) $(GLFW_INCLUDES) $(GLEW_INCLUDES)
 
 # Create list of dependcy files (.d files). These files are used by the
 # compiler to ensure that any .cpp file that includes a .h file that has
 # changed is recompiled
-CPP_DEPENDENCIES = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(CPP_SOURCES))
--include $(CPP_DEPENDENCIES)
+-include $($(patsubst %.cpp, $(BUILD_DIR)/%.d, $(SEQUOIA_SOURCES) $(PROJECT_SOURCES)))
+-include $($(patsubst %.c, $(BUILD_DIR)/%.d, $(GLEW_SOURCES) $(GLFW_SOURCES)))
 
 # Optimisation flags
 OPT = -Og
 CPP_COMPILER=g++
+C_COMPILER=gcc
 
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-CPP_FLAGS = -Wall $(CPP_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) -I../Drivers/GLEW/include
+SEQUOIA_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+PROJECT_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+GLEW_FLAGS = -g -DGLEW_STATIC $(GLEW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+GLFW_FLAGS = -Wall $(GLFW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
 
-# Build the dependency $(TARGET)
-all: $(BUILD_DIR) $(EXECUTABLE)
+# All must depend on the .cpp sources. This ensures that if a .cpp source changes, make
+# will always recompile. The source dependencies will call recipes that will create the
+# associated object files in the build directory. The last dependency 'Linker' will check
+# those build files exist and link everything together. The linker must check the object
+# files in the build folder exist incase make clean was just run but the sources haven't
+# changed since the last make. This ensures the project will always compile correctly
+all: $(BUILD_DIR) $(GLEW_SOURCES) $(GLFW_SOURCES) $(SEQUOIA_SOURCES) $(PROJECT_SOURCES) Linker
 
-# To build the executable, all the associated .o files are required. Because the .o files
-# are saved in a different file so the linking is done seperatley
-$(EXECUTABLE): $(CPP_OBJECTS) Linker
+# Compilation is split from all because all contains dependency for build directory which means $^ cannot be used in action because
+# it will include the build directory and thus cause an error
+Linker: $(GLEW_OBJECTS_BUILD_DIR) $(GLFW_OBJECTS_BUILD_DIR) $(SEQUOIA_OBJECTS_BUILD_DIR) $(PROJECT_OBJECTS_BUILD_DIR)
+	$(CPP_COMPILER) -o $(BUILD_DIR)/$(EXECUTABLE_NAME) $^ -lgdi32 -lopengl32
 
-# Recipe to link all the .o files together and create the executable
-Linker: $(CPP_OBJECTS_NO_DIR) $(GLFW_OBJECTS) $(GLEW_OBJECTS)
-	$(CPP_COMPILER) -o $(EXECUTABLE) $^ -lgdi32 -lopengl32
+# Recipe to create build folder
+$(BUILD_DIR):
+	mkdir $@
+
+# Generic recipes for creating the given object files from the required .cpp files
+$(GLEW_SOURCES):
+	$(C_COMPILER) $(GLEW_FLAGS) -c -o $(BUILD_DIR)/$(notdir $(basename $@)).o $@
+
+$(GLFW_SOURCES):
+	$(C_COMPILER) $(GLFW_FLAGS) -c -o $@ $(BUILD_DIR)/$(notdir $(basename $@)).o $@
+
+$(SEQUOIA_SOURCES):
+	$(CPP_COMPILER) $(SEQUOIA_FLAGS) -c -o $(BUILD_DIR)/$(notdir $(basename $@)).o $@
+
+$(PROJECT_SOURCES):
+	$(CPP_COMPILER) $(PROJECT_FLAGS) -c -o $(BUILD_DIR)/$(notdir $(basename $@)).o $@
+
+
+# Generic recipes for creating the given object files from the required .cpp files
+$(GLEW_OBJECTS_BUILD_DIR): $(GLEW_SOURCES)
+	$(C_COMPILER) $(GLEW_FLAGS) -c -o $@ $(GLEW_DIRECTORY)/$(notdir $(basename $@)).c
+
+$(GLFW_OBJECTS_BUILD_DIR): $(GLFW_SOURCES)
+	$(C_COMPILER) $(GLFW_FLAGS) -c -o $@ $(GLFW_DIRECTORY)/$(notdir $(basename $@)).c
+
+$(SEQUOIA_OBJECTS_BUILD_DIR): $(SEQUOIA_SOURCES)
+	$(CPP_COMPILER) $(SEQUOIA_FLAGS) -c -o $@ $(strip $(filter %/$(notdir $(basename $@).cpp), $(SEQUOIA_SOURCES)))
+
+$(PROJECT_OBJECTS_BUILD_DIR): $(PROJECT_SOURCES)
+	$(CPP_COMPILER) $(PROJECT_FLAGS) -c -o $@ $(strip $(filter %/$(notdir $(basename $@).cpp), $(PROJECT_SOURCES)))
 
 # Delete build directory
 clean:
@@ -68,12 +118,4 @@ clean:
 run:
 	.\$(EXECUTABLE)
 
-# Generic recipe for making .o files from .cpp files
-%.o:%.cpp
-	$(CPP_COMPILER) $(CPP_FLAGS) -c -o $(BUILD_DIR)/$(notdir $@) $^
-
-# Recipe to create build folder
-$(BUILD_DIR):
-	mkdir $@	
-
-.PHONY: all run clean
+.PHONY: run clean
