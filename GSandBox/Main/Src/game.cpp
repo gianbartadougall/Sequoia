@@ -237,11 +237,10 @@ void Game::run() {
 
 		/* Poll for and process events */
 		glfwPollEvents();
-
 		// Print the FPS
 		auto elapsedTime = duration_cast<milliseconds>(system_clock::now() - time1);
 		if (elapsedTime.count() >= 1000) {
-			// std::cout << "FPS: " << frames << std::endl;
+			std::cout << "FPS: " << frames << std::endl;
 			frames = 0;
 			time1  = system_clock::now();
 		}

@@ -5,7 +5,7 @@ EXECUTABLE_NAME = GianSandBox.exe
 
 # Create target name, build directory and executable path
 BUILD_DIR = build
-EXECUTABLE = $(BUILD_DIR)/$(EXECUTABLE_NAME)
+EXECUTABLE = $(BUILD_DIR)\$(EXECUTABLE_NAME)
 
 # Relative path to GLFW and GLEW sources from this makefile
 SEQUOIA_SUB_DIRS = $(wildcard ../Engine/*)
