@@ -96,4 +96,5 @@ if %num%==3 (
         make %1
     ) else (
         echo [31mCould not run project because a makefile error was found.[0m
+        type %errorFile%
     )
