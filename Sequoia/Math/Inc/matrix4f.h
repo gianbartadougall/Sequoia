@@ -25,6 +25,12 @@ namespace matrix4f {
 		// void add(Matrix4f* m1);
 		// void subtract(Matrix4f* m1);
 		void multiply(Matrix4f* m1);
+		void rotatex(float theta);
+		void rotatey(float theta);
+		void rotatez(float theta);
+		void qrotx(float theta);
+		void qroty(float theta);
+		void qrotz(float theta);
 		void transform(Vector4f p, Vector4f s, Vector4f r);
 
 		protected:

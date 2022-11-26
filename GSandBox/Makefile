@@ -8,7 +8,7 @@ BUILD_DIR = build
 EXECUTABLE = $(BUILD_DIR)\$(EXECUTABLE_NAME)
 
 # Relative path to GLFW and GLEW sources from this makefile
-SEQUOIA_SUB_DIRS = $(wildcard ../Engine/*)
+SEQUOIA_SUB_DIRS = $(wildcard ../Sequoia/*)
 PROJECT_SUB_DIRS = $(wildcard *)
 GLEW_DIRECTORY = ../Drivers/GLEW/src
 GLFW_DIRECTORY = ../Drivers/GLFW/src
@@ -61,7 +61,7 @@ C_COMPILER=gcc
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-SEQUOIA_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+SEQUOIA_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) -lm
 PROJECT_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
 GLEW_FLAGS = -g -DGLEW_STATIC $(GLEW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
 GLFW_FLAGS = -Wall $(GLFW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)

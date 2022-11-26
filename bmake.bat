@@ -80,8 +80,8 @@ if %num%==3 (
         call :runIfNoError %1_run
 
     ) else (
-        make %1_%2 > NUL 2> %errorFile%
-        call :runIfNoError %1_run
+        :: Don't run project after this command because it is not a run command
+        make %1_%2 > NUL
     )
 
     goto :eof
