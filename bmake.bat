@@ -1,6 +1,7 @@
 @echo off
 
 set num=0
+set errorFile=errLog.txt
 set verboseFlag=-v
 set verbose=0
 
@@ -26,24 +27,20 @@ if %num%==3 (
 
     :: Num args == 0 -> Run Sequoia
     if %num%==0 (
-        make > NUL
+        make > NUL 2> %errorFile%
+        call :runIfNoError run
         goto :exit
     )
 
     :: Num args == 1 -> Make given project (no args) or Make Seqouia (verbose mode)
     if %num%==1 (
         if "%verbose%"=="1" (
-            make
+            make 2> %errorFile%
+            call :runIfNoError %1_run
+
         ) else (
-            make %1 > NUL
-            set el=%ERRORLEVEL%
-            :: If there was no error, run the program as well
-            if "%el%"=="0" (
-                echo RUNNING! because %el% == 0
-                make %1_run
-            ) else (
-                echo Did not run because %el% != 0
-            )
+            make %1 > NUL 2> %errorFile%
+            call :runIfNoError %1_run
         )
 
         goto :exit
@@ -53,14 +50,9 @@ if %num%==3 (
     :: Make project (verbose mode)
     if %num%==2 (
         if "%verbose%"=="1" (
-            make %1
+            make %1 2> %errorFile%
+            call :runIfNoError %1_run
 
-            if "%el%"=="0" (
-                echo RUNNING! because %el% == 0
-                make %1_run
-            ) else (
-                echo Did not run because %el% != 0
-            )
         ) else (
             call :secondArg %1 %2
         )
@@ -71,10 +63,12 @@ if %num%==3 (
     :: Num args == 3 -> Running sub recipe of project (i.e run, clean) in verbose mode
     if %num%==3 (
         call :secondArg %1 %2
+
         goto :exit
     )
 
 :exit
+    del /f /s /q %errorFile%
     EXIT /b
 
 :secondArg
@@ -82,9 +76,25 @@ if %num%==3 (
     :: Underscore between args 2 and 3 to call appropriate sub recipe
     if "%2"=="run" (
         :: Don't redirect output otherwise print statements won't appear in console
-        make %1_%2
+        make %1_%2 2> %errorFile%
+        call :runIfNoError %1_run
+
     ) else (
+        :: Don't run project after this command because it is not a run command
         make %1_%2 > NUL
     )
 
     goto :eof
+
+:runIfNoError
+
+    findstr /m "Error" %errorFile% >Nul
+
+    :: Run program if error not found
+    if "%ERRORLEVEL%"=="1" (
+        echo [32mCompilation sucessful. Running project...[0m
+        make %1
+    ) else (
+        echo [31mCould not run project because a makefile error was found.[0m
+        type %errorFile%
+    )
