@@ -13,12 +13,16 @@
 
 #include <GL/glew.h>
 
+#include "debugLog.h"
+
 namespace game {
 
 	class Game {
 
 		// Private variables
 		void render();
+
+		debugLog::DebugLog debugLog;
 
 		public:
 		Game();

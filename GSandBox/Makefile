@@ -12,7 +12,6 @@ SEQUOIA_SUB_DIRS = $(wildcard ../Sequoia/*)
 PROJECT_SUB_DIRS = $(wildcard *)
 GLEW_DIRECTORY = ../Drivers/GLEW/src
 GLFW_DIRECTORY = ../Drivers/GLFW/src
-
 # Create list of .cpp sources for each folder
 SEQUOIA_SOURCES = $(strip $(foreach D, $(SEQUOIA_SUB_DIRS), $(wildcard $(D)/Src/*.cpp)))
 PROJECT_SOURCES = $(strip $(foreach D, $(PROJECT_SUB_DIRS), $(wildcard $(D)/Src/*.cpp)))
@@ -38,6 +37,9 @@ SEQUOIA_INCLUDE_FOLDERS = $(foreach D, $(SEQUOIA_SUB_DIRS), $(wildcard $(D)/Inc)
 PROJECT_INCLUDE_FOLDERS = $(foreach D, $(PROJECT_SUB_DIRS), $(wildcard $(D)/Inc))
 SEQUOIA_INCLUDES = $(strip $(patsubst %/Inc, -I%/Inc, $(SEQUOIA_INCLUDE_FOLDERS)))
 PROJECT_INCLUDES = $(strip $(patsubst %/Inc, -I%/Inc, $(PROJECT_INCLUDE_FOLDERS)))
+
+$(info SOURCES: $(PROJECT_SOURCES))
+
 
 # Create list of .h includes for each folder in GLFW and GLEW folders
 GLFW_INCLUDES = -I../Drivers/GLFW/include -I../Drivers/GLFW/src

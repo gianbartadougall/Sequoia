@@ -33,6 +33,8 @@ namespace matrix4f {
 		void qrotz(float theta);
 		void transform(Vector4f p, Vector4f s, Vector4f r);
 
+		void projection_matrix(float height, float width, float far, float near);
+
 		protected:
 	};
 } // namespace matrix4f

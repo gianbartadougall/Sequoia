@@ -31,10 +31,12 @@
 #include "debugLog.h"
 #include "matrix4f.h"
 #include "vector4f.h"
+#include "objectLoader.h"
 
 using namespace game;
 using namespace std::chrono;
 using namespace debugLog;
+using namespace objectLoader;
 
 /* Private variable Declarations */
 GLFWwindow* window;
@@ -53,7 +55,7 @@ Game::Game() {
 		exit(1);
 	}
 
-	window = glfwCreateWindow(640, 480, "Sequoia", NULL, NULL);
+	window = glfwCreateWindow(620, 480, "Sequoia", NULL, NULL);
 	if (window == NULL) {
 		DebugLog::log_error("Window could not be created");
 		exit(2);
@@ -76,12 +78,6 @@ Game::~Game() {
 
 void Game::run() {
 
-	// matrix4f::Matrix4f m2(1, 3, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	// matrix4f::Matrix4f m1(2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3);
-
-	// m2.multiply(&m1);
-	// m2.print();
-
 	shaderLoader::ShaderLoader sl;
 	GLchar* vertexSource   = sl.load_shader(vertexShaderPath);
 	GLchar* fragmentSource = sl.load_shader(fragmentShaderPath);
@@ -92,39 +88,8 @@ void Game::run() {
 	/****** START CODE BLOCK ******/
 	// Description: Testing rendering
 
-	float vertices[] = {
-		-0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 0.0f, // top left (x, y, z, r, g, b)
-		0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, // Top-right (x, y, z, r, g, b)
-		0.5f,  -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // Bottom-right (x, y, z, r, g, b)
-		-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f  // Bottom-left (x, y, z, r, g, b)
-	};
-
-	// float tMatf[16] = {
-	// 	1.0f, 0.0f, 0.0f, 0.2f, //
-	// 	0.0f, 1.0f, 0.0f, 0.2f, //
-	// 	0.0f, 0.0f, 1.0f, 0.2f, //
-	// 	0.0f, 0.0f, 0.0f, 1.0f	//
-	// };
-
-	// Creating the VAO needs to be at the start of your program!!
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	// // Create vertex buffer object. This
-	GLuint vbo;
-	glGenBuffers(1, &vbo); // Generate 1 buffer
-
-	// Create vbo for storing element data. This is means we can reuse vertices
-	GLuint elements[] = {0, 1, 2, 2, 3, 0};
-	GLuint ebo;
-	glGenBuffers(1, &ebo);
-
-	// Make the buffer that was just created active
-	// Adding data to buffer doesn't depend on the id of the buffer but which buffer
-	// is currently active
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	objectLoader::ObjectLoader objLoader;
+	objLoader.load_3D_object("Resources/Objects/cube1.obj");
 
 	// // Create vertex shader object and add shader to vertices
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -180,7 +145,7 @@ void Game::run() {
 	vector4f::Vector4f scale1(1, 1, 1);
 	vector4f::Vector4f rotate1(10, 0, 0);
 	matrix4f::Matrix4f tMat(translate1, scale1, rotate1);
-	tMat.print();
+	// tMat.print();
 
 	matrix4f::Matrix4f rotx;
 	matrix4f::Matrix4f roty;
@@ -202,11 +167,17 @@ void Game::run() {
 	GLint uniTrans = glGetUniformLocation(shaderProgram, "transformation");
 	glUniformMatrix4fv(uniTrans, 1, GL_TRUE, tMat.m);
 
+	matrix4f::Matrix4f proj;
+	proj.projection_matrix(600, 800, 100, 1);
+	GLint projTrans = glGetUniformLocation(shaderProgram, "projectionMatrix");
+	glUniformMatrix4fv(projTrans, 1, GL_TRUE, proj.m);
+	proj.print();
+
 	float theta		 = 0.5f;
 	GLint floatTrans = glGetUniformLocation(shaderProgram, "theta");
 	glUniform1f(floatTrans, theta);
 
-	float scale[3]	 = {1, 1, 1};
+	float scale[3]	 = {0.5, 0.5, 0.5};
 	GLint scaleTrans = glGetUniformLocation(shaderProgram, "scale");
 	glUniform3fv(scaleTrans, 1, scale);
 
@@ -215,11 +186,10 @@ void Game::run() {
 	glUniform3fv(translateTrans, 1, translate);
 
 	// When Drawing multiple triangles, it is saves memory if you can reuse vertices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
 	/****** END CODE BLOCK ******/
-
 	float sd = 1;
 	float td = 1;
 
@@ -283,24 +253,24 @@ void Game::run() {
 		// tMat.multiply(&rotz);
 
 		theta += 0.0001f;
-		translate[0] += td * 0.00001f;
-		translate[1] += td * 0.00001f;
-		translate[2] += td * 0.00001f;
-		scale[0] += sd * 0.00001f;
-		scale[1] += sd * 0.00001f;
-		scale[2] += sd * 0.00001f;
+		// translate[0] = -1;
+		// translate[1] = -2;
+		// translate[2] = 10;
+		scale[0] = 0.5f;
+		scale[1] = 0.5f;
+		scale[2] = 0.5f;
 
-		if (translate[0] > 0.8) {
-			td = -1;
-		} else if (translate[0] < -0.8) {
-			td = 1;
-		}
+		// if (translate[0] > 0.8) {
+		// 	td = -1;
+		// } else if (translate[0] < -0.8) {
+		// 	td = 1;
+		// }
 
-		if (scale[0] > 1.3) {
-			sd = -1;
-		} else if (scale[0] < 0.7) {
-			sd = 1;
-		}
+		// if (scale[0] > 1.3) {
+		// 	sd = -1;
+		// } else if (scale[0] < 0.7) {
+		// 	sd = 1;
+		// }
 
 		glUniform1f(floatTrans, theta);
 		glUniform3fv(scaleTrans, 1, scale);
@@ -313,16 +283,16 @@ void Game::run() {
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ebo);
-	glDeleteVertexArrays(1, &vao);
+	// glDeleteBuffers(1, &vbo);
+	// glDeleteBuffers(1, &ebo);
+	// glDeleteVertexArrays(1, &vao);
 	glfwTerminate();
 }
 
 void Game::render() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear screen to black
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// The last 3 args tell openGL about the element array
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw triangle
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // Draw triangle
 }
