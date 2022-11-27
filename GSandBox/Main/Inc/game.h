@@ -14,6 +14,7 @@
 #include <GL/glew.h>
 
 #include "debugLog.h"
+#include "objectLoader.h"
 
 namespace game {
 
@@ -29,6 +30,7 @@ namespace game {
 		~Game();
 
 		void run();
+		void render(ObjectData* objects, int numObjects);
 	};
 
 } // namespace game

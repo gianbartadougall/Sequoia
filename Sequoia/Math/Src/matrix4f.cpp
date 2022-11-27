@@ -238,40 +238,41 @@ void Matrix4f::rotatez(float theta) {
 	m[15] = 1;
 }
 
-Matrix4f::Matrix4f(Vector4f p, Vector4f s, Vector4f r) {
+Matrix4f::Matrix4f(Vector4f t, Vector4f s, Vector4f r) {
 
 	// Common factors
-	float cosjh		   = cos(r.y) * cos(r.x);
-	float coskh		   = cos(r.z) * cos(r.x);
-	float cosjk		   = cos(r.y) * cos(r.z);
-	float sinjcosk	   = sin(r.y) * cos(r.z);
-	float sinjcosksinh = sinjcosk * sin(r.x);
-	float cosjsinh	   = cos(r.y) * sin(r.x);
-	float sinkcosh	   = sin(r.y) * cos(r.x);
-	float sinkh		   = sin(r.z) * sin(r.x);
-	float sinjkh	   = sin(r.y) * sinkh;
-	float cosksinh	   = cos(r.z) * sin(r.x);
-	float cosjsink	   = cos(r.y) * sin(r.z);
-	float sinjciskh	   = sinjcosk * cos(r.x);
-	float sinjkcosh	   = sin(r.y) * sinkcosh;
+	float cosjh		   = cos(r.v[1]) * cos(r.v[0]);
+	float coskh		   = cos(r.v[2]) * cos(r.v[0]);
+	float cosjk		   = cos(r.v[1]) * cos(r.v[2]);
+	float sinjcosk	   = sin(r.v[1]) * cos(r.v[2]);
+	float sinjcosksinh = sinjcosk * sin(r.v[0]);
+	float cosjsinh	   = cos(r.v[1]) * sin(r.v[0]);
+	float sinkcosh	   = sin(r.v[1]) * cos(r.v[0]);
+	float sinkh		   = sin(r.v[2]) * sin(r.v[0]);
+	float sinjkh	   = sin(r.v[1]) * sinkh;
+	float cosksinh	   = cos(r.v[2]) * sin(r.v[0]);
+	float cosjsink	   = cos(r.v[1]) * sin(r.v[2]);
+	float sinjciskh	   = sinjcosk * cos(r.v[0]);
+	float sinjkcosh	   = sin(r.v[1]) * sinkcosh;
 	float SjkCh_p_CkSh = sinjkcosh + cosksinh;
 	float Skh_m_SjCkh  = sinkh - sinjciskh;
 	float Ckh_m_Sjkh   = coskh - sinjkh;
 
-	m[0] = s.x * cosjk;
-	m[1] = -s.y * cosjsink;
-	m[2] = s.z * sin(r.y);
-	m[3] = (p.x * s.x * cosjk) + (s.z * p.z * sin(r.y)) - (s.y * p.y * cosjsink);
+	m[0] = s.v[0] * cosjk;
+	m[1] = -s.v[1] * cosjsink;
+	m[2] = s.v[2] * sin(r.v[1]);
+	m[3] = (t.v[0] * s.v[0] * cosjk) + (s.v[2] * t.v[2] * sin(r.v[1])) - (s.v[1] * t.v[1] * cosjsink);
 
-	m[4] = s.x * (sinjcosksinh + (sinkcosh));
-	m[5] = s.y * Ckh_m_Sjkh;
-	m[6] = -s.z * cosjsinh;
-	m[7] = (p.x * s.x * (sinjcosksinh + sinkcosh)) + (s.y * p.y * Ckh_m_Sjkh) - (s.z * p.z * cosjsinh);
+	m[4] = s.v[0] * (sinjcosksinh + (sinkcosh));
+	m[5] = s.v[1] * Ckh_m_Sjkh;
+	m[6] = -s.v[2] * cosjsinh;
+	m[7] =
+		(t.v[0] * s.v[0] * (sinjcosksinh + sinkcosh)) + (s.v[1] * t.v[1] * Ckh_m_Sjkh) - (s.v[2] * t.v[2] * cosjsinh);
 
-	m[8]  = s.x * Skh_m_SjCkh;
-	m[9]  = s.y * SjkCh_p_CkSh;
-	m[10] = s.z * cosjh;
-	m[11] = (p.x * s.x * Skh_m_SjCkh) + (s.y * p.y * SjkCh_p_CkSh) + (s.z * p.z * cosjh);
+	m[8]  = s.v[0] * Skh_m_SjCkh;
+	m[9]  = s.v[1] * SjkCh_p_CkSh;
+	m[10] = s.v[2] * cosjh;
+	m[11] = (t.v[0] * s.v[0] * Skh_m_SjCkh) + (s.v[1] * t.v[1] * SjkCh_p_CkSh) + (s.v[2] * t.v[2] * cosjh);
 
 	m[12] = 0;
 	m[13] = 0;

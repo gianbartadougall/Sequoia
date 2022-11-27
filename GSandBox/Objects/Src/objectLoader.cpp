@@ -14,8 +14,6 @@
 #include <sstream>
 
 /* GLEW Includes */
-#define GLEW_STATIC
-#include <GL/glew.h>
 
 /* Private Includes */
 #include "objectLoader.h"
@@ -50,7 +48,7 @@ ObjectLoader::~ObjectLoader() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-void ObjectLoader::load_3D_object(string objFilePath) {
+void ObjectLoader::load_3D_object(string objFilePath, ObjectData* objectData) {
 
 	if (objectIndex == MAX_NUM_OBJECTS) {
 		debugLog.log_error("Maximum number of objects already loaded. Please increase size to load more!");
@@ -137,6 +135,10 @@ void ObjectLoader::load_3D_object(string objFilePath) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eba[objectIndex]);
 	// Store element data into the current active element buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elementData), elementData, GL_STATIC_DRAW);
+
+	// Copy object data to struct
+	objectData->elementBuffer	 = eba[objectIndex];
+	objectData->elementArraySize = numFaces * 3;
 
 	objectIndex++;
 }
