@@ -15,12 +15,20 @@
 #include <string.h>
 
 /* GLEW Includes */
+#define GLEW_STATIC
+#include <GL/glew.h>
 
 /* Private Includes */
 #include "debugLog.h"
 
 /* Public Macros */
 #define MAX_NUM_OBJECTS 1
+
+/* Public Enumerations and Structures */
+typedef struct ObjectData {
+	GLuint elementBuffer;
+	int elementArraySize;
+} ObjectData;
 
 using namespace debugLog;
 
@@ -46,7 +54,7 @@ namespace objectLoader {
 		ObjectLoader();
 		~ObjectLoader();
 
-		void load_3D_object(string path);
+		void load_3D_object(string path, ObjectData* objects);
 		void split_triplet(string data, string* splitList, int start, char delimiter);
 	};
 } // namespace objectLoader

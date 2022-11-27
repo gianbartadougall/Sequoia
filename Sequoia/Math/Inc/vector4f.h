@@ -1,24 +1,23 @@
-#ifndef VECTOR4F
-#define VECTOR4F
+#ifndef VECTOR4F_H
+#define VECTOR4F_H
 
 namespace vector4f {
 
 	class Vector4f {
 
 		public:
-		float x;
-		float y;
-		float z;
+		float v[4];
 
 		Vector4f();
-		Vector4f(float x, float y, float z);
+		Vector4f(float x, float y, float z, float wi);
 		~Vector4f();
 
-		void set(float xi, float yi, float zi);
-		void add(float xi, float yi, float zi);
-		void subtract(Vector4f v);
-		float dot(Vector4f v);
+		void add(Vector4f v1);
+		void add(float xi, float yi, float zi, float wi);
+
+		void subtract(Vector4f v1);
+		void subtract(float xi, float yi, float zi, float wi);
 	};
 } // namespace vector4f
 
-#endif // VECTOR4F
+#endif // VECTOR4F_H
