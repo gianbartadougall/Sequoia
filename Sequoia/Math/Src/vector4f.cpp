@@ -46,3 +46,19 @@ void Vector4f::subtract(Vector4f v1) {
 	v[2] -= v1.v[2];
 	v[3] -= v1.v[3];
 }
+
+void Vector4f::set_x(float x) {
+	v[0] = x;
+}
+
+void Vector4f::set_y(float y) {
+	v[1] = y;
+}
+
+void Vector4f::set_z(float z) {
+	v[2] = z;
+}
+
+void Vector4f::set_w(float w) {
+	v[3] = w;
+}

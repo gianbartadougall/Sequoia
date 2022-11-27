@@ -31,18 +31,22 @@
 #include "debugLog.h"
 #include "matrix4f.h"
 #include "vector4f.h"
+#include "objectLoader.h"
+#include "array.h"
 
 using namespace game;
 using namespace std::chrono;
 using namespace debugLog;
 using namespace objectLoader;
+using namespace object;
 
 /* Private variable Declarations */
 GLFWwindow* window;
 
 // Shader sources
-std::string vertexShaderPath   = "Shaders/qvertex_shader.glsl";
+std::string vertexShaderPath   = "Shaders/vertex_shader.glsl";
 std::string fragmentShaderPath = "Shaders/fragment_shader.glsl";
+std::string objectFilePath	   = "Resources/Objects/";
 
 /* Private Function Declartations */
 
@@ -54,7 +58,7 @@ Game::Game() {
 		exit(1);
 	}
 
-	window = glfwCreateWindow(620, 480, "Sequoia", NULL, NULL);
+	window = glfwCreateWindow(1920, 1080, "Sequoia", NULL, NULL);
 	if (window == NULL) {
 		DebugLog::log_error("Window could not be created");
 		exit(2);
@@ -80,8 +84,15 @@ void Game::run() {
 	system_clock::time_point time1 = system_clock::now();
 
 	objectLoader::ObjectLoader objLoader;
-	ObjectData objects[1];
-	objLoader.load_3D_object("Resources/Objects/cube1.obj", &objects[0]);
+	const int numObjects		   = 2;
+	string objectNames[numObjects] = {objectFilePath + "cube1.obj", objectFilePath + "ground.obj"};
+
+	Object* objects = objLoader.load_objects(objectNames, numObjects);
+
+	// ObjectData objects[numObjects];
+	// for (int i = 0; i < numObjects; i++) {
+	// 	objLoader.load_3D_object(objectFilePath + objectNames[i], &objects[i]);
+	// }
 
 	shaderLoader::ShaderLoader sl;
 	GLuint shaderProgramId = sl.load_shader(vertexShaderPath, fragmentShaderPath);
@@ -89,16 +100,31 @@ void Game::run() {
 	/****** START CODE BLOCK ******/
 	// Description: Testing rendering
 
-	vector3f::Vector3f translate(0.0f, 0.0f, 0.0f);
-	vector3f::Vector3f scale(0.5, 0.5, 0.5);
-	vector4f::Vector4f rotate(10, 1, 1, 0);
+	vector3f::Vector3f translateC(0.0f, 0.0f, -1.0f);
+	vector3f::Vector3f scaleC(0.2, 0.2, 0.2);
+	vector4f::Vector4f rotateC(0.2, 1, 0, 0);
 
-	sl.load_vertex_shader_attributes(shaderProgramId, translate, scale, rotate);
+	vector3f::Vector3f translateP(0.0f, 0.0f, -1.0f);
+	vector3f::Vector3f scaleP(0.3, 0.3, 0.3);
+	vector4f::Vector4f rotateP(0.2, 1, 0, 0);
+
+	// matrix4f::Matrix4f projMat;
+	// projMat.projection_matrix(480, 620, 10, 1);
+	// GLint projectionMatrix = glGetUniformLocation(shaderProgramId, "projectionMatrix");
+	// glUniformMatrix4fv(projectionMatrix, 1, GL_TRUE, projMat.m);
+
+	// matrix4f::Matrix4f transMat;
+	// transMat.rotatex(0.001);
+	// GLint tranformationMatrix = glGetUniformLocation(shaderProgramId, "transformationMatrix");
+	// glUniformMatrix4fv(tranformationMatrix, 1, GL_TRUE, transMat.m);
+
+	sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
 
 	/****** END CODE BLOCK ******/
-	float sd = 1;
-	float td = 1;
+	float theta = 0;
+	float phi	= 0;
 
+	debugLog.log_message("Reached while loop");
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		// Handle key presses
@@ -150,17 +176,15 @@ void Game::run() {
 			time1  = system_clock::now();
 		}
 
-		rotate.add(0.00001, 0, 0, 0);
-
-		sl.load_vertex_shader_attributes(shaderProgramId, translate, scale, rotate);
-
+		rotateC.add(0.0001, 0, 0, 0);
+		sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
 		frames++;
 	}
 
 	glfwTerminate();
 }
 
-void Game::render(ObjectData* objects, int numObjects) {
+void Game::render(Object* objects, int numObjects) {
 
 	// Clear the screen to bloack
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -168,10 +192,11 @@ void Game::render(ObjectData* objects, int numObjects) {
 
 	for (int i = 0; i < numObjects; i++) {
 		// TODO: Bind the vertex buffer as well so when there are multiple objects they will render correctly
+		glBindBuffer(GL_ARRAY_BUFFER, objects->mesh->vbo);
 
 		// Bind the element buffer
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[i].elementBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[i].mesh->ebo);
 		// Draw the object
-		glDrawElements(GL_TRIANGLES, objects[i].elementArraySize, GL_UNSIGNED_INT, 0); // Draw triangle
+		glDrawElements(GL_TRIANGLES, objects[i].mesh->eboSize, GL_UNSIGNED_INT, 0); // Draw triangle
 	}
 }

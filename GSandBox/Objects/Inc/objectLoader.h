@@ -20,6 +20,7 @@
 
 /* Private Includes */
 #include "debugLog.h"
+#include "object.h"
 
 /* Public Macros */
 #define MAX_NUM_OBJECTS 1
@@ -31,29 +32,31 @@ typedef struct ObjectData {
 } ObjectData;
 
 using namespace debugLog;
+using namespace object;
 
 namespace objectLoader {
 
 	class ObjectLoader {
 
 		// Private variables
-		debugLog::DebugLog debugLog;
+		debugLog::DebugLog log;
 
 		// Variable to store how many objects have been loaded
 		int objectIndex = 0;
 
-		// Create array of vertex buffers
-		GLuint vba[MAX_NUM_OBJECTS];
-
-		// Create array of element buffers
-		GLuint eba[MAX_NUM_OBJECTS];
+		// Array for vertex buffers and element buffers
+		GLuint* vba;
+		GLuint* eba;
 
 		GLuint vao;
+
+		object::Object* objects;
+		int numObjects;
 
 		public:
 		ObjectLoader();
 		~ObjectLoader();
-
+		Object* load_objects(string objectFileNames[], int numObjects);
 		void load_3D_object(string path, ObjectData* objects);
 		void split_triplet(string data, string* splitList, int start, char delimiter);
 	};

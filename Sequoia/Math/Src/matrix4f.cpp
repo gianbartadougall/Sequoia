@@ -145,6 +145,28 @@ void Matrix4f::rotatey(float theta) {
 	m[15] = 1;
 }
 
+void Matrix4f::rotatez(float theta) {
+	m[0] = cos(theta);
+	m[1] = -sin(theta);
+	m[2] = 0;
+	m[3] = 0;
+
+	m[4] = sin(theta);
+	m[5] = cos(theta);
+	m[6] = 0;
+	m[7] = 0;
+
+	m[8]  = 0;
+	m[9]  = 0;
+	m[10] = 1;
+	m[11] = 0;
+
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+}
+
 void Matrix4f::qrotx(float theta) {
 	float ct  = cos(0.01);
 	float ct2 = ct * ct;
@@ -216,28 +238,6 @@ void Matrix4f::qrotz(float theta) {
 	m[15] = cos(theta);
 }
 
-void Matrix4f::rotatez(float theta) {
-	m[0] = cos(theta);
-	m[1] = -sin(theta);
-	m[2] = 0;
-	m[3] = 0;
-
-	m[4] = sin(theta);
-	m[5] = cos(theta);
-	m[6] = 0;
-	m[7] = 0;
-
-	m[8]  = 0;
-	m[9]  = 0;
-	m[10] = 1;
-	m[11] = 0;
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
-}
-
 Matrix4f::Matrix4f(Vector4f t, Vector4f s, Vector4f r) {
 
 	// Common factors
@@ -287,6 +287,26 @@ void Matrix4f::projection_matrix(float height, float width, float far, float nea
 	float bottom	  = -top;
 	float right		  = top * aspectRatio;
 	float left		  = -right;
+
+	// m[0] = (2 * near) / (right - left);
+	// m[1] = 0;
+	// m[2] = 0;
+	// m[3] = 0;
+
+	// m[4] = 0;
+	// m[5] = (2 * near) / (top - bottom);
+	// m[6] = 0;
+	// m[7] = 0;
+
+	// m[8]  = (right + left) / (right - left);
+	// m[9]  = (top + bottom) / (top - bottom);
+	// m[10] = -(far + near) / (far - near);
+	// m[11] = -1;
+
+	// m[12] = 0;
+	// m[13] = 0;
+	// m[14] = -(2 * far * near) / (far - near);
+	// m[15] = 0;
 
 	m[0] = (2 * near) / (right - left);
 	m[1] = 0;

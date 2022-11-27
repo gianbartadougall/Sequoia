@@ -17,6 +17,10 @@ namespace vector4f {
 
 		void subtract(Vector4f v1);
 		void subtract(float xi, float yi, float zi, float wi);
+		void set_x(float x);
+		void set_y(float y);
+		void set_z(float z);
+		void set_w(float w);
 	};
 } // namespace vector4f
 

@@ -59,14 +59,15 @@ INCLUDES = $(SEQUOIA_INCLUDES) $(PROJECT_INCLUDES) $(GLFW_INCLUDES) $(GLEW_INCLU
 OPT = -Og
 CPP_COMPILER=g++
 C_COMPILER=gcc
+DEBUG_MODE=-g
 
 # Ensures .cpp files are recompiled if header files are edited 
 DEPENDENCY_FLAGS = -MP -MD
 
-SEQUOIA_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) -lm
-PROJECT_FLAGS = -Wall $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
-GLEW_FLAGS = -g -DGLEW_STATIC $(GLEW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
-GLFW_FLAGS = -Wall $(GLFW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+SEQUOIA_FLAGS = -Wall $(DEBUG_MODE) $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT) -lm
+PROJECT_FLAGS = -Wall $(DEBUG_MODE) $(INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+GLEW_FLAGS = $(DEBUG_MODE) -DGLEW_STATIC $(GLEW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
+GLFW_FLAGS = $(DEBUG_MODE) -Wall $(GLFW_INCLUDES) $(DEPENDENCY_FLAGS) $(OPT)
 
 # All must depend on the .cpp sources. This ensures that if a .cpp source changes, make
 # will always recompile. The source dependencies will call recipes that will create the

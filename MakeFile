@@ -23,6 +23,9 @@ hayden_run:
 gian:
 	$(MAKE) -C GSandBox
 
+gian_debug:
+	$(MAKE) debug -C GSandBox
+
 gian_clean:
 	$(MAKE) clean -C GSandBox
 
