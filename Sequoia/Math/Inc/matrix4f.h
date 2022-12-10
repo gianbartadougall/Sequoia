@@ -8,6 +8,10 @@ namespace matrix4f {
 
 	class Matrix4f {
 
+		// void rotatex(float theta);
+		// void rotatey(float theta);
+		// void rotatez(float theta);
+
 		// Private variables go here
 		public:
 		float m[16];
@@ -25,15 +29,16 @@ namespace matrix4f {
 		// void add(Matrix4f* m1);
 		// void subtract(Matrix4f* m1);
 		void multiply(Matrix4f* m1);
-		void rotatex(float theta);
-		void rotatey(float theta);
-		void rotatez(float theta);
 		void qrotx(float theta);
 		void qroty(float theta);
 		void qrotz(float theta);
 		void transform(Vector4f p, Vector4f s, Vector4f r);
-
+		void scale(float scalar);
+		void scale(float sx, float sy, float sz);
 		void projection_matrix(float height, float width, float far, float near);
+
+		void rotate(float rx, float ry, float rz);
+		void translate(float x, float y, float z);
 
 		protected:
 	};

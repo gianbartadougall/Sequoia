@@ -33,6 +33,9 @@ ObjectLoader::ObjectLoader() {
 	// Create VAO
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+std:
+	cout << "VAO = " << vao << std::endl;
 }
 
 ObjectLoader::~ObjectLoader() {

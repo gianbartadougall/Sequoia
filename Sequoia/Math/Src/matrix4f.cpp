@@ -7,51 +7,49 @@
 using namespace matrix4f;
 using namespace vector4f;
 
-// void Matrix4f::add(Matrix4f* m1) {
+void Matrix4f::scale(float scalar) {
+	m[0] = scalar;
+	m[1] = 0;
+	m[2] = 0;
+	m[3] = 0;
 
-// 	m[0][0] += m1->m[0][0];
-// 	m[0][1] += m1->m[0][1];
-// 	m[0][2] += m1->m[0][2];
-// 	m[0][3] += m1->m[0][3];
+	m[4] = 0;
+	m[5] = scalar;
+	m[6] = 0;
+	m[7] = 0;
 
-// 	m[1][0] += m1->m[1][0];
-// 	m[1][1] += m1->m[1][1];
-// 	m[1][2] += m1->m[1][2];
-// 	m[1][3] += m1->m[1][3];
+	m[8]  = 0;
+	m[9]  = 0;
+	m[10] = scalar;
+	m[11] = 0;
 
-// 	m[2][0] += m1->m[2][0];
-// 	m[2][1] += m1->m[2][1];
-// 	m[2][2] += m1->m[2][2];
-// 	m[2][3] += m1->m[2][3];
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+}
 
-// 	m[3][0] += m1->m[3][0];
-// 	m[3][1] += m1->m[3][1];
-// 	m[3][2] += m1->m[3][2];
-// 	m[3][3] += m1->m[3][3];
-// }
+void Matrix4f::scale(float sx, float sy, float sz) {
+	m[0] = sx;
+	m[1] = 0;
+	m[2] = 0;
+	m[3] = 0;
 
-// void Matrix4f::subtract(Matrix4f* m1) {
+	m[4] = 0;
+	m[5] = sy;
+	m[6] = 0;
+	m[7] = 0;
 
-// 	m[0][0] -= m1->m[0][0];
-// 	m[0][1] -= m1->m[0][1];
-// 	m[0][2] -= m1->m[0][2];
-// 	m[0][3] -= m1->m[0][3];
+	m[8]  = 0;
+	m[9]  = 0;
+	m[10] = sz;
+	m[11] = 0;
 
-// 	m[1][0] -= m1->m[1][0];
-// 	m[1][1] -= m1->m[1][1];
-// 	m[1][2] -= m1->m[1][2];
-// 	m[1][3] -= m1->m[1][3];
-
-// 	m[2][0] -= m1->m[2][0];
-// 	m[2][1] -= m1->m[2][1];
-// 	m[2][2] -= m1->m[2][2];
-// 	m[2][3] -= m1->m[2][3];
-
-// 	m[3][0] -= m1->m[3][0];
-// 	m[3][1] -= m1->m[3][1];
-// 	m[3][2] -= m1->m[3][2];
-// 	m[3][3] -= m1->m[3][3];
-// }
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+}
 
 Matrix4f::~Matrix4f() {}
 
@@ -101,70 +99,107 @@ Matrix4f::Matrix4f(float a0, float a1, float a2, float a3, float a4, float a5, f
 	m[15] = a15;
 }
 
-void Matrix4f::rotatex(float theta) {
-	m[0] = 1;
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
+void Matrix4f::translate(float x, float y, float z) {
 
-	m[4] = 0;
-	m[5] = cos(theta);
-	m[6] = -sin(theta);
-	m[7] = 0;
+	Matrix4f translate;
+	translate.m[0]	= 1;
+	translate.m[1]	= 0;
+	translate.m[2]	= 0;
+	translate.m[3]	= 0;
+	translate.m[4]	= 0;
+	translate.m[5]	= 1;
+	translate.m[6]	= 0;
+	translate.m[7]	= 0;
+	translate.m[8]	= 0;
+	translate.m[9]	= 0;
+	translate.m[10] = 1;
+	translate.m[11] = 0;
+	translate.m[12] = x;
+	translate.m[13] = y;
+	translate.m[14] = z;
+	translate.m[15] = 1;
 
-	m[8]  = 0;
-	m[9]  = sin(theta);
-	m[10] = cos(theta);
-	m[11] = 0;
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	multiply(&translate);
 }
 
-void Matrix4f::rotatey(float theta) {
-	m[0] = cos(theta);
-	m[1] = 0;
-	m[2] = sin(theta);
-	m[3] = 0;
+void Matrix4f::rotate(float rx, float ry, float rz) {
 
-	m[4] = 0;
-	m[5] = 1;
-	m[6] = 0;
-	m[7] = 0;
+	/* The rotation matrix for rotating along the x-axis is given by
+		1	0		0		0
+		0	cos(x)	-sin(x)	0
+		0	sin(x)	cos(x)	0
+		0	0		0		1
+	*/
+	Matrix4f rotationX;
+	rotationX.m[0]	= 1;
+	rotationX.m[1]	= 0;
+	rotationX.m[2]	= 0;
+	rotationX.m[3]	= 0;
+	rotationX.m[4]	= 0;
+	rotationX.m[5]	= cos(rx);
+	rotationX.m[6]	= -sin(rx);
+	rotationX.m[7]	= 0;
+	rotationX.m[8]	= 0;
+	rotationX.m[9]	= sin(rx);
+	rotationX.m[10] = cos(rx);
+	rotationX.m[11] = 0;
+	rotationX.m[12] = 0;
+	rotationX.m[13] = 0;
+	rotationX.m[14] = 0;
+	rotationX.m[15] = 1;
 
-	m[8]  = -sin(theta);
-	m[9]  = 0;
-	m[10] = cos(theta);
-	m[11] = 0;
+	/* The rotation matrix for rotating along the y-axis is given by
+		cos(y)	0	sin(y)	0
+		0		1	0		0
+		-sin(y)	0	cos(y)	0
+		0		0	0		1
+	*/
+	Matrix4f rotationY;
+	rotationY.m[0]	= cos(ry);
+	rotationY.m[1]	= 0;
+	rotationY.m[2]	= sin(ry);
+	rotationY.m[3]	= 0;
+	rotationY.m[4]	= 0;
+	rotationY.m[5]	= 1;
+	rotationY.m[6]	= 0;
+	rotationY.m[7]	= 0;
+	rotationY.m[8]	= -sin(ry);
+	rotationY.m[9]	= 0;
+	rotationY.m[10] = cos(ry);
+	rotationY.m[11] = 0;
+	rotationY.m[12] = 0;
+	rotationY.m[13] = 0;
+	rotationY.m[14] = 0;
+	rotationY.m[15] = 1;
 
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
-}
+	/* The rotation matrix for rotating along the z-axis is given by
+		cos(z)	-sin(z)	0	0
+		sin(z)	cos(z)	0	0
+		0		0		1	0
+		0		0		0	1
+	*/
+	Matrix4f rotationZ;
+	rotationZ.m[0]	= cos(rz);
+	rotationZ.m[1]	= -sin(rz);
+	rotationZ.m[2]	= 0;
+	rotationZ.m[3]	= 0;
+	rotationZ.m[4]	= sin(rz);
+	rotationZ.m[5]	= cos(rx);
+	rotationZ.m[6]	= 0;
+	rotationZ.m[7]	= 0;
+	rotationZ.m[8]	= 0;
+	rotationZ.m[9]	= 0;
+	rotationZ.m[10] = 1;
+	rotationZ.m[11] = 0;
+	rotationZ.m[12] = 0;
+	rotationZ.m[13] = 0;
+	rotationZ.m[14] = 0;
+	rotationZ.m[15] = 1;
 
-void Matrix4f::rotatez(float theta) {
-	m[0] = cos(theta);
-	m[1] = -sin(theta);
-	m[2] = 0;
-	m[3] = 0;
-
-	m[4] = sin(theta);
-	m[5] = cos(theta);
-	m[6] = 0;
-	m[7] = 0;
-
-	m[8]  = 0;
-	m[9]  = 0;
-	m[10] = 1;
-	m[11] = 0;
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	// Apply all rotations to the matrix of this class
+	multiply(&rotationX);
+	multiply(&rotationY);
+	multiply(&rotationZ);
 }
 
 void Matrix4f::qrotx(float theta) {
@@ -280,13 +315,22 @@ Matrix4f::Matrix4f(Vector4f t, Vector4f s, Vector4f r) {
 	m[15] = 1;
 }
 
-void Matrix4f::projection_matrix(float height, float width, float far, float near) {
+// void Matrix4f::viewMatrix(Vector3f pos) {}
+
+void Matrix4f::projection_matrix(float width, float height, float near, float far) {
 	float FOV		  = 70.0f;
 	float aspectRatio = width / height;
 	float top		  = tan(FOV * 0.5) * near;
 	float bottom	  = -top;
 	float right		  = top * aspectRatio;
 	float left		  = -right;
+
+	// float FOV		  = 70.0f;
+	// float aspectRatio = width / height;
+	// float top	 = height / 2;
+	// float bottom = -top;
+	// float right	 = width / 2;
+	// float left	 = -right;
 
 	// m[0] = (2 * near) / (right - left);
 	// m[1] = 0;
@@ -327,12 +371,6 @@ void Matrix4f::projection_matrix(float height, float width, float far, float nea
 	m[13] = 0;
 	m[14] = -1;
 	m[15] = 0;
-}
-
-void Matrix4f::transform(Vector4f p, Vector4f s, Vector4f r) {
-
-	Matrix4f transformation(p, s, r);
-	multiply(&transformation);
 }
 
 void Matrix4f::multiply(Matrix4f* m1) {
@@ -384,3 +422,69 @@ void Matrix4f::print() {
 	printf("(%f %f %f %f\r\n %f %f %f %f\r\n %f %f %f %f\r\n %f %f %f %f)\r\n", m[0], m[1], m[2], m[3], m[4], m[5],
 		   m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
 }
+
+// void Matrix4f::rotatex(float theta) {
+// 	m[0] = 1;
+// 	m[1] = 0;
+// 	m[2] = 0;
+// 	m[3] = 0;
+
+// 	m[4] = 0;
+// 	m[5] = cos(theta);
+// 	m[6] = -sin(theta);
+// 	m[7] = 0;
+
+// 	m[8]  = 0;
+// 	m[9]  = sin(theta);
+// 	m[10] = cos(theta);
+// 	m[11] = 0;
+
+// 	m[12] = 0;
+// 	m[13] = 0;
+// 	m[14] = 0;
+// 	m[15] = 1;
+// }
+
+// void Matrix4f::rotatey(float theta) {
+// 	m[0] = cos(theta);
+// 	m[1] = 0;
+// 	m[2] = sin(theta);
+// 	m[3] = 0;
+
+// 	m[4] = 0;
+// 	m[5] = 1;
+// 	m[6] = 0;
+// 	m[7] = 0;
+
+// 	m[8]  = -sin(theta);
+// 	m[9]  = 0;
+// 	m[10] = cos(theta);
+// 	m[11] = 0;
+
+// 	m[12] = 0;
+// 	m[13] = 0;
+// 	m[14] = 0;
+// 	m[15] = 1;
+// }
+
+// void Matrix4f::rotatez(float theta) {
+// 	m[0] = cos(theta);
+// 	m[1] = -sin(theta);
+// 	m[2] = 0;
+// 	m[3] = 0;
+
+// 	m[4] = sin(theta);
+// 	m[5] = cos(theta);
+// 	m[6] = 0;
+// 	m[7] = 0;
+
+// 	m[8]  = 0;
+// 	m[9]  = 0;
+// 	m[10] = 1;
+// 	m[11] = 0;
+
+// 	m[12] = 0;
+// 	m[13] = 0;
+// 	m[14] = 0;
+// 	m[15] = 1;
+// }

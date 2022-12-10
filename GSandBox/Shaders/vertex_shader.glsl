@@ -27,5 +27,5 @@ void main() {
     
     // Assign the position and the colour
     gl_Position = vec4(pos, 1.0);
-    Colour = 0.5 * (pos + vec3(1, 1, 1));
+    Colour = 0.5 * ((pos + colour));
 }

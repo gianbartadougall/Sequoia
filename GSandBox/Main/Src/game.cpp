@@ -40,11 +40,14 @@ using namespace debugLog;
 using namespace objectLoader;
 using namespace object;
 
+#define WINDOW_WIDTH  1000
+#define WINDOW_HEIGHT 600
+
 /* Private variable Declarations */
 GLFWwindow* window;
 
 // Shader sources
-std::string vertexShaderPath   = "Shaders/vertex_shader.glsl";
+std::string vertexShaderPath   = "Shaders/mvertex_shader.glsl";
 std::string fragmentShaderPath = "Shaders/fragment_shader.glsl";
 std::string objectFilePath	   = "Resources/Objects/";
 
@@ -58,7 +61,7 @@ Game::Game() {
 		exit(1);
 	}
 
-	window = glfwCreateWindow(1920, 1080, "Sequoia", NULL, NULL);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Sequoia", NULL, NULL);
 	if (window == NULL) {
 		DebugLog::log_error("Window could not be created");
 		exit(2);
@@ -84,8 +87,9 @@ void Game::run() {
 	system_clock::time_point time1 = system_clock::now();
 
 	objectLoader::ObjectLoader objLoader;
-	const int numObjects		   = 2;
-	string objectNames[numObjects] = {objectFilePath + "cube1.obj", objectFilePath + "ground.obj"};
+	const int numObjects		   = 1;
+	string objectNames[numObjects] = {objectFilePath + "cube1.obj"};
+	vector3f::Vector3f cubePosition(0, 0, 0);
 
 	Object* objects = objLoader.load_objects(objectNames, numObjects);
 
@@ -96,69 +100,46 @@ void Game::run() {
 
 	shaderLoader::ShaderLoader sl;
 	GLuint shaderProgramId = sl.load_shader(vertexShaderPath, fragmentShaderPath);
-
+	debugLog.log_message("Shader loaded");
 	/****** START CODE BLOCK ******/
 	// Description: Testing rendering
 
 	vector3f::Vector3f translateC(0.0f, 0.0f, -1.0f);
 	vector3f::Vector3f scaleC(0.2, 0.2, 0.2);
-	vector4f::Vector4f rotateC(0.2, 1, 0, 0);
+	vector4f::Vector4f rotateC(0.2, 1, 1, 0);
 
 	vector3f::Vector3f translateP(0.0f, 0.0f, -1.0f);
 	vector3f::Vector3f scaleP(0.3, 0.3, 0.3);
 	vector4f::Vector4f rotateP(0.2, 1, 0, 0);
 
-	// matrix4f::Matrix4f projMat;
-	// projMat.projection_matrix(480, 620, 10, 1);
-	// GLint projectionMatrix = glGetUniformLocation(shaderProgramId, "projectionMatrix");
-	// glUniformMatrix4fv(projectionMatrix, 1, GL_TRUE, projMat.m);
+	matrix4f::Matrix4f projMat;
+	projMat.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 10);
+	GLint projectionMatrix = glGetUniformLocation(shaderProgramId, "projectionMatrix");
+	glUniformMatrix4fv(projectionMatrix, 1, GL_TRUE, projMat.m);
 
-	// matrix4f::Matrix4f transMat;
-	// transMat.rotatex(0.001);
-	// GLint tranformationMatrix = glGetUniformLocation(shaderProgramId, "transformationMatrix");
-	// glUniformMatrix4fv(tranformationMatrix, 1, GL_TRUE, transMat.m);
+	// GLint cubePos = glGetUniformLocation(shaderProgramId, "cPos");
+	// glUniform3fv(cubePos, 1, cubePosition.v);
+	// cubePosition.set(0, 0, 0);
 
-	sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
+	projMat.print();
+
+	matrix4f::Matrix4f transMat;
+	transMat.scale(0.2);
+	transMat.translate(0, 0, -5.0);
+	GLint tranformationMatrix = glGetUniformLocation(shaderProgramId, "transformationMatrix");
+	glUniformMatrix4fv(tranformationMatrix, 1, GL_FALSE, transMat.m);
+
+	// sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
+
+	// glUniform3fv(cubePos, 1, cubePosition.v);
 
 	/****** END CODE BLOCK ******/
 	float theta = 0;
 	float phi	= 0;
 
-	debugLog.log_message("Reached while loop");
+	debugLog.log_message("Reached while loop 1");
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
-		// Handle key presses
-		// if (GetKeyState('A') & 0x8000) {
-		// 	// Move the object to the left
-		// 	translate.set(-distance, 0, 0);
-		// 	tMat.transform(translate, scale, rotate);
-		// 	tMat.print();
-		// 	translate.set(0, 0, 0);
-		// }
-
-		// if (GetKeyState('D') & 0x8000) {
-		// 	// Move the object to the left
-		// 	translate.set(distance, 0, 0);
-		// 	tMat.transform(translate, scale, rotate);
-		// 	tMat.print();
-		// 	translate.set(0, 0, 0);
-		// }
-
-		// if (GetKeyState('W') & 0x8000) {
-		// 	// Move the object to the left
-		// 	scale.set(1.01f, 1.01f, 1.01f);
-		// 	tMat.transform(translate, scale, rotate);
-		// 	tMat.print();
-		// 	scale.set(1, 1, 1);
-		// }
-
-		// if (GetKeyState('S') & 0x8000) {
-		// 	// Move the object to the left
-		// 	scale.set(0.99f, 0.99f, 0.99f);
-		// 	tMat.transform(translate, scale, rotate);
-		// 	tMat.print();
-		// 	scale.set(1, 1, 1);
-		// }
 
 		/* Render here */
 		render(objects, 1);
@@ -174,10 +155,18 @@ void Game::run() {
 			// std::cout << "FPS: " << frames << std::endl;
 			frames = 0;
 			time1  = system_clock::now();
+			transMat.print();
 		}
+		// transMat.rotate(0.0001, 0, 0);
+		transMat.translate(0, 0, 0.0001);
 
-		rotateC.add(0.0001, 0, 0, 0);
-		sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
+		// transMat.translate(0, 0, 0.0001);
+
+		glUseProgram(shaderProgramId);
+		glUniformMatrix4fv(tranformationMatrix, 1, GL_FALSE, transMat.m);
+
+		// rotateC.add(0.0001, 0, 0, 0);
+		// sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
 		frames++;
 	}
 
@@ -200,3 +189,35 @@ void Game::render(Object* objects, int numObjects) {
 		glDrawElements(GL_TRIANGLES, objects[i].mesh->eboSize, GL_UNSIGNED_INT, 0); // Draw triangle
 	}
 }
+
+// if (GetKeyState('A') & 0x8000) {
+// 	// Move the object to the left
+// 	translate.set(-distance, 0, 0);
+// 	tMat.transform(translate, scale, rotate);
+// 	tMat.print();
+// 	translate.set(0, 0, 0);
+// }
+
+// if (GetKeyState('D') & 0x8000) {
+// 	// Move the object to the left
+// 	translate.set(distance, 0, 0);
+// 	tMat.transform(translate, scale, rotate);
+// 	tMat.print();
+// 	translate.set(0, 0, 0);
+// }
+
+// if (GetKeyState('W') & 0x8000) {
+// 	// Move the object to the left
+// 	scale.set(1.01f, 1.01f, 1.01f);
+// 	tMat.transform(translate, scale, rotate);
+// 	tMat.print();
+// 	scale.set(1, 1, 1);
+// }
+
+// if (GetKeyState('S') & 0x8000) {
+// 	// Move the object to the left
+// 	scale.set(0.99f, 0.99f, 0.99f);
+// 	tMat.transform(translate, scale, rotate);
+// 	tMat.print();
+// 	scale.set(1, 1, 1);
+// }

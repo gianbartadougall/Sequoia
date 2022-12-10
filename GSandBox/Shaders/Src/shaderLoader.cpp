@@ -141,14 +141,24 @@ GLuint ShaderLoader::link_shaders(GLuint vertexShaderId, GLuint fragmentShaderId
 
 	glUseProgram(shaderProgramId);
 
-	posAttrib = glGetAttribLocation(shaderProgramId, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	// posAttrib = glGetAttribLocation(shaderProgramId, "position");
+	// std::cout << "Pos attrib: " << posAttrib << std::endl;
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	glBindAttribLocation(shaderProgramId, 0, "position");
 
 	// To make OpenGL take in the colour data we need to do the following
-	colAttrib = glGetAttribLocation(shaderProgramId, "colour");
-	glEnableVertexAttribArray(colAttrib);
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	// colAttrib = glGetAttribLocation(shaderProgramId, "colour");
+	// std::cout << "Col attrib: " << colAttrib << std::endl;
+	// glEnableVertexAttribArray(colAttrib);
+	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	// Print out all these errors that occurred
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "Error occurred. Code : " << err << endl;
+		// Process/log the error.
+	}
 
 	return shaderProgramId;
 }
