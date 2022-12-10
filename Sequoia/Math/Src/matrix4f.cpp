@@ -325,51 +325,24 @@ void Matrix4f::projection_matrix(float width, float height, float near, float fa
 	float right		  = top * aspectRatio;
 	float left		  = -right;
 
-	// float FOV		  = 70.0f;
-	// float aspectRatio = width / height;
-	// float top	 = height / 2;
-	// float bottom = -top;
-	// float right	 = width / 2;
-	// float left	 = -right;
-
-	// m[0] = (2 * near) / (right - left);
-	// m[1] = 0;
-	// m[2] = 0;
-	// m[3] = 0;
-
-	// m[4] = 0;
-	// m[5] = (2 * near) / (top - bottom);
-	// m[6] = 0;
-	// m[7] = 0;
-
-	// m[8]  = (right + left) / (right - left);
-	// m[9]  = (top + bottom) / (top - bottom);
-	// m[10] = -(far + near) / (far - near);
-	// m[11] = -1;
-
-	// m[12] = 0;
-	// m[13] = 0;
-	// m[14] = -(2 * far * near) / (far - near);
-	// m[15] = 0;
-
 	m[0] = (2 * near) / (right - left);
 	m[1] = 0;
-	m[2] = (right + left) / (right - left);
+	m[2] = 0;
 	m[3] = 0;
 
 	m[4] = 0;
 	m[5] = (2 * near) / (top - bottom);
-	m[6] = (top + bottom) / (top - bottom);
+	m[6] = 0;
 	m[7] = 0;
 
-	m[8]  = 0;
-	m[9]  = 0;
+	m[8]  = (right + left) / (right - left);
+	m[9]  = (top + bottom) / (top - bottom);
 	m[10] = -(far + near) / (far - near);
-	m[11] = -(2 * far * near) / (far - near);
+	m[11] = -1;
 
 	m[12] = 0;
 	m[13] = 0;
-	m[14] = -1;
+	m[14] = -(2 * far * near) / (far - near);
 	m[15] = 0;
 }
 

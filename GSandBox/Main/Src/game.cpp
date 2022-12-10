@@ -115,11 +115,7 @@ void Game::run() {
 	matrix4f::Matrix4f projMat;
 	projMat.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 10);
 	GLint projectionMatrix = glGetUniformLocation(shaderProgramId, "projectionMatrix");
-	glUniformMatrix4fv(projectionMatrix, 1, GL_TRUE, projMat.m);
-
-	// GLint cubePos = glGetUniformLocation(shaderProgramId, "cPos");
-	// glUniform3fv(cubePos, 1, cubePosition.v);
-	// cubePosition.set(0, 0, 0);
+	glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, projMat.m);
 
 	projMat.print();
 
@@ -128,10 +124,6 @@ void Game::run() {
 	transMat.translate(0, 0, -5.0);
 	GLint tranformationMatrix = glGetUniformLocation(shaderProgramId, "transformationMatrix");
 	glUniformMatrix4fv(tranformationMatrix, 1, GL_FALSE, transMat.m);
-
-	// sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
-
-	// glUniform3fv(cubePos, 1, cubePosition.v);
 
 	/****** END CODE BLOCK ******/
 	float theta = 0;
@@ -165,8 +157,6 @@ void Game::run() {
 		glUseProgram(shaderProgramId);
 		glUniformMatrix4fv(tranformationMatrix, 1, GL_FALSE, transMat.m);
 
-		// rotateC.add(0.0001, 0, 0, 0);
-		// sl.load_vertex_shader_attributes(shaderProgramId, translateC, scaleC, rotateC);
 		frames++;
 	}
 
