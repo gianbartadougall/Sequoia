@@ -39,12 +39,12 @@ namespace mesh {
 		debugLog::DebugLog log;
 
 		public:
+		GLuint vao; // Vertex array object
 		GLuint vbo; // Vertex buffer object
-
 		GLuint ebo; // Element buffer object
 		int eboSize;
-
 		Mesh(GLuint vboId, GLuint eboId);
+		
 		~Mesh();
 
 		void load_mesh(string objectFilePath, Vector3f colour);

@@ -27,15 +27,14 @@
 
 using namespace objectLoader;
 using namespace array;
-using namespace object;
+using namespace entity;
 
 ObjectLoader::ObjectLoader() {
 	// Create VAO
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-std:
-	cout << "VAO = " << vao << std::endl;
+	std::cout << "VAO = " << vao << std::endl;
 }
 
 ObjectLoader::~ObjectLoader() {
@@ -65,8 +64,12 @@ Object* ObjectLoader::load_objects(string objectFileNames[], int numObjects) {
 	// Allocate memory required for list of objects. Each object has one vbo
 	// and one ebo thus creating a list of them as well
 	this->objects = new Object[this->numObjects];
-	this->vba	  = new GLuint[this->numObjects];
-	this->eba	  = new GLuint[this->numObjects];
+	// this->vao	  = new GLuint[this->numObjects];
+	this->vba = new GLuint[this->numObjects];
+	this->eba = new GLuint[this->numObjects];
+
+	// Generate list of vaos
+	// glGenVertexArrays(this->numObjects, this->vao);
 
 	// Genereate vbos and ebos
 	glGenBuffers(this->numObjects, this->vba);

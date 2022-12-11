@@ -1,9 +1,9 @@
 /**
  * @file game.cpp
  * @author Gian Barta-Dougall
- * @brief System file for object
+ * @brief System file for Loader
  * @version 0.1
- * @date Sun Nov 27 20:31:08 2022
+ * @date Sun Dec 11 14:51:50 2022
 
  *
  * @copyright Copyright (c)
@@ -15,15 +15,14 @@
 /* GLEW Includes */
 
 /* Private Includes */
-#include "object.h"
+#include "Loader.h"
 
 /* Private Macros */
 
 /* Private Enumerations and Structures */
 
-using namespace object;
+using namespace loader;
 
-Object::Object() {}
+Loader::Loader() {}
 
-Object::~Object() {}
-
+Loader::~Loader() {}

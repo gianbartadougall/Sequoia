@@ -83,7 +83,6 @@ void Mesh::load_mesh(string objectFilePath, Vector3f colour) {
 
 	/****** END CODE BLOCK ******/
 
-	array::Array array;
 	// Store data into the arrays that were just created
 	while (getline(objFile, line)) {
 
@@ -115,8 +114,24 @@ void Mesh::load_mesh(string objectFilePath, Vector3f colour) {
 		}
 	}
 
-	// Bind the vertex buffer for this object to make it active
+	// Bind the vao and vbo for this mesh to make them active
+	glBindVertexArray(this->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+
+	// Bind the VAO for this mesh. The VAO stores the settings on how OpenGL should draw this object
+	// glEnableVertexAttribArray(this->vao);
+
+	/**
+	 * @param1: The vao these settings will be saved in
+	 * @param2: The number of components per vertex. Using 3D graphics => each vertex has x,y,z components
+	 * @param3: The data type of each component in the vbo
+	 * @param4: Whether the data should be normalised or not -> NOT ACTUALLY SURE WHAT THIS MEANS
+	 * @param5: The number of data points associated to each vertex. Each vertex has an x,y,z location and a r,g,b colour
+	 * @param6: The offset of when to start reading the data from the vbo
+	 */
+	// glVertexAttribPointer(this->vao, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GL_FLOAT), 0);
+	// glBindAttribLocation(shaderProgram, this->vao, "position");
+
 	// Store vertex data into the current active vertex buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
 

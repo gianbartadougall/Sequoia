@@ -29,6 +29,28 @@ void Matrix4f::scale(float scalar) {
 	m[15] = 1;
 }
 
+void Matrix4f::scale(Vector3f scalar) {
+	m[0] = scalar.v[0];
+	m[1] = 0;
+	m[2] = 0;
+	m[3] = 0;
+
+	m[4] = 0;
+	m[5] = scalar.v[1];
+	m[6] = 0;
+	m[7] = 0;
+
+	m[8]  = 0;
+	m[9]  = 0;
+	m[10] = scalar.v[2];
+	m[11] = 0;
+
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+}
+
 void Matrix4f::scale(float sx, float sy, float sz) {
 	m[0] = sx;
 	m[1] = 0;
@@ -203,8 +225,7 @@ void Matrix4f::rotate(float rx, float ry, float rz) {
 }
 
 void Matrix4f::qrotx(float theta) {
-	float ct  = cos(0.01);
-	float ct2 = ct * ct;
+	float ct = cos(0.01);
 
 	m[0] = 1;
 	m[1] = 0;
@@ -273,49 +294,21 @@ void Matrix4f::qrotz(float theta) {
 	m[15] = cos(theta);
 }
 
-Matrix4f::Matrix4f(Vector4f t, Vector4f s, Vector4f r) {
+void Matrix4f::transform(Vector3f translate, Vector3f rotate, Vector3f scale) {
 
-	// Common factors
-	float cosjh		   = cos(r.v[1]) * cos(r.v[0]);
-	float coskh		   = cos(r.v[2]) * cos(r.v[0]);
-	float cosjk		   = cos(r.v[1]) * cos(r.v[2]);
-	float sinjcosk	   = sin(r.v[1]) * cos(r.v[2]);
-	float sinjcosksinh = sinjcosk * sin(r.v[0]);
-	float cosjsinh	   = cos(r.v[1]) * sin(r.v[0]);
-	float sinkcosh	   = sin(r.v[1]) * cos(r.v[0]);
-	float sinkh		   = sin(r.v[2]) * sin(r.v[0]);
-	float sinjkh	   = sin(r.v[1]) * sinkh;
-	float cosksinh	   = cos(r.v[2]) * sin(r.v[0]);
-	float cosjsink	   = cos(r.v[1]) * sin(r.v[2]);
-	float sinjciskh	   = sinjcosk * cos(r.v[0]);
-	float sinjkcosh	   = sin(r.v[1]) * sinkcosh;
-	float SjkCh_p_CkSh = sinjkcosh + cosksinh;
-	float Skh_m_SjCkh  = sinkh - sinjciskh;
-	float Ckh_m_Sjkh   = coskh - sinjkh;
+	Matrix4f translation;
+	translation.translate(translate.v[0], translate.v[1], translate.v[2]);
 
-	m[0] = s.v[0] * cosjk;
-	m[1] = -s.v[1] * cosjsink;
-	m[2] = s.v[2] * sin(r.v[1]);
-	m[3] = (t.v[0] * s.v[0] * cosjk) + (s.v[2] * t.v[2] * sin(r.v[1])) - (s.v[1] * t.v[1] * cosjsink);
+	Matrix4f rotation;
+	rotation.rotate(rotate.v[0], rotate.v[1], rotate.v[2]);
 
-	m[4] = s.v[0] * (sinjcosksinh + (sinkcosh));
-	m[5] = s.v[1] * Ckh_m_Sjkh;
-	m[6] = -s.v[2] * cosjsinh;
-	m[7] =
-		(t.v[0] * s.v[0] * (sinjcosksinh + sinkcosh)) + (s.v[1] * t.v[1] * Ckh_m_Sjkh) - (s.v[2] * t.v[2] * cosjsinh);
+	Matrix4f scalar;
+	scalar.scale(scale);
 
-	m[8]  = s.v[0] * Skh_m_SjCkh;
-	m[9]  = s.v[1] * SjkCh_p_CkSh;
-	m[10] = s.v[2] * cosjh;
-	m[11] = (t.v[0] * s.v[0] * Skh_m_SjCkh) + (s.v[1] * t.v[1] * SjkCh_p_CkSh) + (s.v[2] * t.v[2] * cosjh);
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	this->multiply(&rotation);
+	this->multiply(&scalar);
+	this->multiply(&translation);
 }
-
-// void Matrix4f::viewMatrix(Vector3f pos) {}
 
 void Matrix4f::projection_matrix(float width, float height, float near, float far) {
 	float FOV		  = 70.0f;

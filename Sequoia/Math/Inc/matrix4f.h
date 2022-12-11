@@ -2,6 +2,9 @@
 #define MATRIX_4F
 
 #include "vector4f.h"
+#include "vector3f.h"
+
+using namespace vector3f;
 using namespace vector4f;
 
 namespace matrix4f {
@@ -32,8 +35,9 @@ namespace matrix4f {
 		void qrotx(float theta);
 		void qroty(float theta);
 		void qrotz(float theta);
-		void transform(Vector4f p, Vector4f s, Vector4f r);
+		void transform(Vector3f translate, Vector3f rotate, Vector3f scale);
 		void scale(float scalar);
+		void scale(Vector3f scalar);
 		void scale(float sx, float sy, float sz);
 		void projection_matrix(float height, float width, float far, float near);
 

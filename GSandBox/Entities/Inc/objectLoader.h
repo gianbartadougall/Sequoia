@@ -45,10 +45,9 @@ namespace objectLoader {
 		int objectIndex = 0;
 
 		// Array for vertex buffers and element buffers
+		GLuint vao;
 		GLuint* vba;
 		GLuint* eba;
-
-		GLuint vao;
 
 		object::Object* objects;
 		int numObjects;
