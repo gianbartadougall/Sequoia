@@ -26,9 +26,7 @@ using namespace entity;
 Entity::Entity() {
 
 	// Generate buffers for vbo and the ebo
-	log.log_message("Generating vbo");
 	glGenBuffers(1, &this->vbo);
-	log.log_message("Generating ebo");
 	glGenBuffers(1, &this->ebo);
 }
 

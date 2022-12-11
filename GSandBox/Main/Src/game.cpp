@@ -47,6 +47,9 @@ using namespace object;
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 600
 
+static double cxpos = 0;
+static double cypos = 0;
+
 #define OBJECT(line) (line[0] == 'O')
 
 /* Private variable Declarations */
@@ -55,8 +58,7 @@ GLFWwindow* window;
 // Shader sources
 std::string vertexShaderPath   = "Shaders/mvertex_shader.glsl";
 std::string fragmentShaderPath = "Shaders/fragment_shader.glsl";
-std::string objectFilePath	   = "Resources/Objects/";
-std::string TEST_GAME		   = "Resources/Games/test_game.txt";
+std::string TEST_GAME		   = "../Resources/Games/test_game.txt";
 
 /* Private Function Declartations */
 
@@ -80,6 +82,9 @@ Game::Game() {
 	if (glewInit() != GLEW_OK) {
 		DebugLog::log_error("GLEW could not be initialised");
 	}
+
+	// glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 Game::~Game() {
@@ -93,63 +98,38 @@ void Game::run() {
 	int frames					   = 0;
 	system_clock::time_point time1 = system_clock::now();
 
-	// objectLoader::ObjectLoader objLoader;
-	// const int numObjects1			= 1;
-	// string objectNames[numObjects1] = {objectFilePath + "cube1.obj"};
-	// vector3f::Vector3f cubePosition(0, 0, 0);
-
-	// Object* objects1 = objLoader.load_objects(objectNames, numObjects);
-
-	// ObjectData objects[numObjects];
-	// for (int i = 0; i < numObjects; i++) {
-	// 	objLoader.load_3D_object(objectFilePath + objectNames[i], &objects[i]);
-	// }
-	log.log_message("Starting to load game");
+	// Load everything in the game (only consists of objects at the moment)
 	load_game(TEST_GAME);
 
 	shaderLoader::ShaderLoader sl;
 	this->objects[0].shaderId = sl.load_shader(vertexShaderPath, fragmentShaderPath);
-	log.log_message("Shader loaded");
+
 	/****** START CODE BLOCK ******/
-	// Description: Testing rendering
-
-	vector3f::Vector3f translateC(0.0f, 0.0f, -3.0f);
-	vector3f::Vector3f scaleC(0.2, 0.2, 0.2);
-	vector3f::Vector3f rotateC(0, 0, 0);
-
-	vector3f::Vector3f translateP(0.0f, 0.0f, -1.0f);
-	vector3f::Vector3f scaleP(0.3, 0.3, 0.3);
-	vector4f::Vector4f rotateP(0.2, 1, 0, 0);
+	// Description: Loading the projection matrix into the vertex shader. This only needs to be done once at the start
+	// because the projection matrix should never need to change
 
 	matrix4f::Matrix4f projMat;
 	projMat.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 10);
 	GLint projectionMatrix = glGetUniformLocation(this->objects[0].shaderId, "projectionMatrix");
 	glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, projMat.m);
 
-	matrix4f::Matrix4f viewMat;
-	vector3f::Vector3f camera(0, 0, 0);
-	GLint viewMatrix = glGetUniformLocation(this->objects[0].shaderId, "viewMatrix");
-	glUniformMatrix4fv(viewMatrix, 1, GL_FALSE, viewMat.m);
-
-	projMat.print();
-	matrix4f::Matrix4f tMat;
-	tMat.translate(0, 0, -5);
-
-	float dist = -2;
-	matrix4f::Matrix4f transMat;
-	transMat.scale(0.2);
-	transMat.translate(0, 0, dist);
-	GLint tranformationMatrix = glGetUniformLocation(this->objects[0].shaderId, "transformationMatrix");
-	glUniformMatrix4fv(tranformationMatrix, 1, GL_FALSE, transMat.m);
-
 	/****** END CODE BLOCK ******/
-	log.log_message("Reached while loop 1");
+
+	// for (int i = 0; i < this->numEntities; i++) {
+
+	// 	cout << "vbo: " << this->objects[i].vbo << endl;
+	// 	cout << "ebo: " << this->objects[i].ebo << endl;
+	// }
+
+	cout << "entities: " << this->numEntities << endl;
 
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 
+		detect_keys();
+
 		/* Render here */
-		render(objects, 1);
+		render(this->objects);
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -159,50 +139,51 @@ void Game::run() {
 		// Print the FPS
 		auto elapsedTime = duration_cast<milliseconds>(system_clock::now() - time1);
 		if (elapsedTime.count() >= 1000) {
-			// std::cout << "FPS: " << frames << std::endl;
+			std::cout << "FPS: " << frames << std::endl;
 			frames = 0;
 			time1  = system_clock::now();
-			// transMat.print();
 		}
-		transMat.translate(0, 0, -dist);
-		transMat.rotate(0.00001, 0.0003, 0.00005);
-		transMat.translate(0, 0, dist);
 
-		glUniformMatrix4fv(tranformationMatrix, 1, GL_FALSE, transMat.m);
+		/****** START CODE BLOCK ******/
+		// Description: Manipulate the orientation, position and scale of the objects in the scene
+		for (int i = 0; i < this->numEntities; i++) {
+			objects[i].rotation.add(0.000, 0.0001, 0.000);
+		}
 
+		/****** END CODE BLOCK ******/
 		frames++;
 	}
 
 	glfwTerminate();
 }
 
-void Game::render(Object* objects, int numObjects) {
+void Game::render(Object* objects) {
 
 	// Clear the screen to bloack
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // WHAT DOES THIS DO??
 
-	for (int i = 0; i < numObjects; i++) {
+	// All the objects use the same shader program for the moment
+	glUseProgram(this->objects[0].shaderId);
 
-		// TODO: Bind the vertex buffer as well so when there are multiple objects they will render correctly
-		// glBindBuffer(GL_ARRAY_BUFFER, objects1->mesh->vbo);
-
-		// Bind the element buffer
-		// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects1[i].mesh->ebo);
-
-		// Draw the object
-		// glDrawElements(GL_TRIANGLES, objects1[i].mesh->eboSize, GL_UNSIGNED_INT, 0); // Draw triangle
-
-		// Bind the vertex array object
-		// glBindVertexArray(this->vao);
-		// glEnableVertexAttibArray(this->vao);
+	for (int i = 0; i < this->numEntities; i++) {
 
 		// Update the uniforms so the correct values are loaded in the shaders for this object
-		glUseProgram(this->objects[i].shaderId);
 
-		// Create the transformation matrix
-		// matrix4f::Matrix4f transformationMatrix;
-		// transformationMatrix.transmform(objects[i].translate, objects[i].rotate, objects[i].scale);
+		// Create transformation matrix. The rotation and scale must preceed the translation otherwise the resultant
+		// matrix will distort the object because scale and rotating must happen when the object is at (0,0,0)
+		matrix4f::Matrix4f tMat;
+		GLint transMatId = glGetUniformLocation(this->objects[0].shaderId, "transformationMatrix");
+		tMat.scale(objects[i].scale.v[0], objects[i].scale.v[1], objects[i].scale.v[2]);
+		tMat.rotate(objects[i].rotation.v[0], objects[i].rotation.v[1], objects[i].rotation.v[2]);
+		tMat.translate(objects[i].position.v[0], objects[i].position.v[1], objects[i].position.v[2]);
+		glUniformMatrix4fv(transMatId, 1, GL_FALSE, tMat.m);
+
+		matrix4f::Matrix4f vMat;
+		GLint viewMatrixId = glGetUniformLocation(this->objects[i].shaderId, "viewMatrix");
+		vMat.rotate(this->cameraRot.v[0], this->cameraRot.v[1], this->cameraRot.v[2]);
+		vMat.translate(this->cameraPos.v[0], this->cameraPos.v[1], this->cameraPos.v[2]);
+		glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, vMat.m);
 
 		glBindBuffer(GL_ARRAY_BUFFER, objects[i].vbo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[i].ebo);
@@ -222,12 +203,12 @@ void Game::load_game(string filePath) {
 	}
 
 	// Calculate the number of entities in the game
-	int numEntities = 0;
+	this->numEntities = 0;
 	string line;
 	while (getline(gameFile, line)) {
 
 		if (OBJECT(line)) {
-			numEntities++;
+			this->numEntities++;
 		}
 	}
 
@@ -255,38 +236,61 @@ void Game::load_game(string filePath) {
 			objIndex++;
 		}
 	}
-
-	std::cout << numEntities << " objects loaded" << std::endl;
 }
 
-// if (GetKeyState('A') & 0x8000) {
-// 	// Move the object to the left
-// 	translate.set(-distance, 0, 0);
-// 	tMat.transform(translate, scale, rotate);
-// 	tMat.print();
-// 	translate.set(0, 0, 0);
-// }
+void Game::detect_mouse() {
 
-// if (GetKeyState('D') & 0x8000) {
-// 	// Move the object to the left
-// 	translate.set(distance, 0, 0);
-// 	tMat.transform(translate, scale, rotate);
-// 	tMat.print();
-// 	translate.set(0, 0, 0);
-// }
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
 
-// if (GetKeyState('W') & 0x8000) {
-// 	// Move the object to the left
-// 	scale.set(1.01f, 1.01f, 1.01f);
-// 	tMat.transform(translate, scale, rotate);
-// 	tMat.print();
-// 	scale.set(1, 1, 1);
-// }
+	if (xpos < 0 || ypos < 0 || xpos > WINDOW_WIDTH || ypos > WINDOW_HEIGHT) {
+		return;
+	}
 
-// if (GetKeyState('S') & 0x8000) {
-// 	// Move the object to the left
-// 	scale.set(0.99f, 0.99f, 0.99f);
-// 	tMat.transform(translate, scale, rotate);
-// 	tMat.print();
-// 	scale.set(1, 1, 1);
-// }
+	if (xpos < (WINDOW_WIDTH / 2)) {
+		this->cameraRot.add(0, 0.001, 0);
+	}
+
+	if (xpos > (WINDOW_WIDTH / 2)) {
+		this->cameraRot.add(0, -0.001, 0);
+	}
+
+	if (ypos < (WINDOW_HEIGHT / 2)) {
+		this->cameraRot.add(0.001, 0, 0);
+	}
+
+	if (ypos > (WINDOW_HEIGHT / 2)) {
+		this->cameraRot.add(-0.001, 0, 0);
+	}
+
+	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+}
+
+void Game::detect_keys() {
+
+	detect_mouse();
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		// Move the camera to the left
+		this->cameraPos.add(0.001, 0, 0);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		// Move the camera to the right
+		this->cameraPos.add(-0.001, 0, 0);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		// Move the camera forward
+		this->cameraPos.add(0, 0, 0.001);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		// Move the camera backward
+		this->cameraPos.add(0, 0, -0.001);
+	}
+}

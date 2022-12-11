@@ -37,6 +37,7 @@ namespace vector3f {
 		void add(float xi, float yi, float zi);
 		void subtract(Vector3f v);
 		float dot(Vector3f v);
+		void print();
 	};
 } // namespace vector3f
 

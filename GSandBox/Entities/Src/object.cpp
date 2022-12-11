@@ -34,7 +34,7 @@ Object::Object() {}
 Object::~Object() {}
 
 void Object::load(string objectData) {
-	log.log_message("Beginning load");
+
 	// Objects are stored in following format O,filePath,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
 	// Split the string by delimiter to extract data
 
@@ -42,7 +42,8 @@ void Object::load(string objectData) {
 	strUtils.split_string(objectData, data, 0, ',');
 
 	// Load the object
-	load_mesh("Resources/Objects/" + data[1], this);
+	cout << "loading model: ../Resources/Models/" << data[1] << endl;
+	load_mesh("../Resources/Models/" + data[1], this);
 
 	// Set the initial position of this object
 	this->position.set(stof(data[2]), stof(data[3]), stof(data[4]));

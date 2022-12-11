@@ -11,6 +11,7 @@
  */
 
 /* Public Includes */
+#include <iostream>
 
 /* GLEW Includes */
 
@@ -22,6 +23,7 @@
 /* Private Enumerations and Structures */
 
 using namespace vector3f;
+using namespace std;
 
 Vector3f::Vector3f() {
 	v[0] = 0;
@@ -47,4 +49,8 @@ void Vector3f::set(float xi, float yi, float zi) {
 	v[0] = xi;
 	v[1] = yi;
 	v[2] = zi;
+}
+
+void Vector3f::print() {
+	cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")" << endl;
 }

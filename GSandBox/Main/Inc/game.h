@@ -17,6 +17,7 @@
 #include "debugLog.h"
 #include "object.h"
 #include "entity.h"
+#include "vector3f.h"
 
 using namespace object;
 
@@ -26,6 +27,11 @@ namespace game {
 
 		// Private variables
 		Object* objects;
+		int numEntities;
+		
+		vector3f::Vector3f cameraPos;
+		vector3f::Vector3f cameraRot;
+
 		GLuint vao;
 
 		void render();
@@ -38,7 +44,10 @@ namespace game {
 
 		void run();
 		void load_game(string filePath);
-		void render(Object* objects, int numObjects);
+		void render(Object* objects);
+		void detect_keys();
+		void detect_mouse();
+
 	};
 
 } // namespace game
