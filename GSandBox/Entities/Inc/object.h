@@ -21,6 +21,7 @@
 #include "entity.h"
 #include "strUtils.h"
 #include "debugLog.h"
+#include "baseShader.h"
 
 /* Public Macros */
 
@@ -28,6 +29,7 @@
 
 using namespace mesh;
 using namespace strUtils;
+using namespace baseShader;
 
 namespace object {
 
@@ -39,14 +41,13 @@ namespace object {
 
 		public:
 		Mesh* mesh;
+		int loadShaderId;
 
 		Object();
 		~Object();
-
-		void load(string data);
-		void load_shader_attributes();
+		void load(string objectData);
+		void load(string objectData, BaseShader* shader);
 		void load_mesh(string filePath, Entity* entity);
-
 	};
 } // namespace object
 

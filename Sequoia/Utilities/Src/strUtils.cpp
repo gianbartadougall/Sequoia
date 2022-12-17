@@ -28,14 +28,14 @@ StrUtils::StrUtils() {}
 StrUtils::~StrUtils() {}
 
 /**
- * @brief Splits a line containing three pieces of data all seperated by a common delimiter.
+ * @brief Splits a line containing data where each piece of data is seperated by a common delimiter.
  * E.g
  * 		string line = "data = 0 2 4"
  * 		string results[3];
  *
  * 		// Because the delimiter is a space and there are other spaces in the input string,
  * 		// the start index specifies what index the function will start splitting up data
- * 		split_triplet(line, results, 6, ' ');
+ * 		split_triplet(line, results, 7, ' ');
  *
  * This code will output
  * 		results[0] = "0"

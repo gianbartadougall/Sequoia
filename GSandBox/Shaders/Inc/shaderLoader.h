@@ -22,6 +22,7 @@
 #include "vector4f.h"
 #include "vector3f.h"
 #include "debugLog.h"
+#include "baseShader.h"
 
 /* Public Macros */
 
@@ -29,6 +30,7 @@
 
 using namespace vector3f;
 using namespace vector4f;
+using namespace baseShader;
 
 namespace shaderLoader {
 
@@ -48,6 +50,17 @@ namespace shaderLoader {
 
 		ShaderLoader();
 		~ShaderLoader();
+
+		void load_baseshader(string line, BaseShader* shader);
+		// GLuint load_shader(string vertexShader, string fragmentShader);
+		// void load_fragment_shader_attributes();
+		// void load_vertex_shader_attributes(GLuint shaderProgramId, Vector3f translation, Vector3f scale,
+		// 								   Vector4f rotation);
+
+		// GLchar* read_shader(std::string filePath);
+		// GLuint link_shaders(GLuint vertexShaderId, GLuint fragmentShaderId);
+		// GLuint compile_shader(string shaderFilePath, int shaderType);
+		GLuint find_shader_variable_location(GLuint shaderId, string variableName);
 
 		GLuint load_shader(string vertexShaderPath, string fragmentShaderPath);
 		void load_fragment_shader_attributes();

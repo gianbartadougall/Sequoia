@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdlib.h>
 
 /* GLEW Includes */
 
@@ -33,9 +34,33 @@ Object::Object() {}
 
 Object::~Object() {}
 
+/****** START CODE BLOCK ******/
+// Description: TEMP CODE FOR TESTING
 void Object::load(string objectData) {
 
-	// Objects are stored in following format O,filePath,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
+	// Objects are stored in following format O,shaderId,filePath,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
+	// Split the string by delimiter to extract data
+
+	string data[12];
+	strUtils.split_string(objectData, data, 0, ',');
+
+	// Load the object
+	const int i		   = 1;
+	this->loadShaderId = atoi(data[i].c_str());
+	cout << "loading model: ../Resources/Models/" << data[i + 1] << endl;
+	load_mesh("../Resources/Models/" + data[i + 1], this);
+
+	// Set the initial position of this object
+	this->position.set(stof(data[i + 2]), stof(data[i + 3]), stof(data[i + 4]));
+	this->rotation.set(stof(data[i + 5]), stof(data[i + 6]), stof(data[i + 7]));
+	this->scale.set(stof(data[i + 8]), stof(data[i + 9]), stof(data[i + 10]));
+}
+
+/****** END CODE BLOCK ******/
+
+void Object::load(string objectData, BaseShader* shader) {
+
+	// Objects are stored in following format O,filePath,sid,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
 	// Split the string by delimiter to extract data
 
 	string data[11];
@@ -45,13 +70,14 @@ void Object::load(string objectData) {
 	cout << "loading model: ../Resources/Models/" << data[1] << endl;
 	load_mesh("../Resources/Models/" + data[1], this);
 
+	// Assign a pointer to the shader
+	this->shader = shader;
+
 	// Set the initial position of this object
 	this->position.set(stof(data[2]), stof(data[3]), stof(data[4]));
 	this->rotation.set(stof(data[5]), stof(data[6]), stof(data[7]));
 	this->scale.set(stof(data[8]), stof(data[9]), stof(data[10]));
 }
-
-void Object::load_shader_attributes() {}
 
 void Object::load_mesh(string filePath, Entity* entity) {
 
@@ -129,12 +155,8 @@ void Object::load_mesh(string filePath, Entity* entity) {
 		}
 	}
 
-	// Bind the vao and vbo for this mesh to make them active
-	// glBindVertexArray(this->vao);
+	// Bind the vbo for this mesh to make them active
 	glBindBuffer(GL_ARRAY_BUFFER, entity->vbo);
-
-	// Bind the VAO for this mesh. The VAO stores the settings on how OpenGL should draw this object
-	// glEnableVertexAttribArray(this->vao);
 
 	/**
 	 * @param1: The vao these settings will be saved in
@@ -156,5 +178,5 @@ void Object::load_mesh(string filePath, Entity* entity) {
 	// Store element data into the current active element buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elementData), elementData, GL_STATIC_DRAW);
 
-	log.log_message("Finished loading objects");
+	log.log_message("Finished loading object");
 }

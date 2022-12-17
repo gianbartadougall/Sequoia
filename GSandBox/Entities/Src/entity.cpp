@@ -36,3 +36,7 @@ Entity::~Entity() {
 	glDeleteBuffers(1, &this->vbo);
 	glDeleteBuffers(1, &this->ebo);
 }
+
+void Entity::load_shader(BaseShader* shader) {
+	this->shader = shader;
+}

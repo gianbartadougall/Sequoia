@@ -23,12 +23,14 @@
 #include "mesh.h"
 #include "vector3f.h"
 #include "debugLog.h"
+#include "baseShader.h"
 
 /* Public Macros */
 
 /* Public Enumerations and Structures */
 
 using namespace vector3f;
+using namespace baseShader;
 
 namespace entity {
 
@@ -38,14 +40,13 @@ namespace entity {
 		debugLog::DebugLog log;
 
 		public:
-
 		// Ids for the mesh of the entity to stored for rendering
 		GLuint vbo;
 		GLuint ebo;
 		int eboSize;
 
 		// ID for the entity to be rendered using the correct shader program
-		int shaderId;
+		BaseShader* shader;
 
 		// Attributes to place the entity in the correct location/orientation/scale in the world
 		Vector3f position;
@@ -55,13 +56,7 @@ namespace entity {
 		Entity();
 		~Entity();
 
-		void load_shader_attributes() {
-			log.log_error("Entity: Should not call this function");
-		}
-		void load(string data) {
-			log.log_error("Entity: This function should not be called");
-		}
-
+		void load_shader(BaseShader* shader);
 	};
 } // namespace entity
 

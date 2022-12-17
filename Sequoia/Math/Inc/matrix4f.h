@@ -27,22 +27,21 @@ namespace matrix4f {
 		~Matrix4f();
 
 		void print();
-		// void scale(float scalar);
 
-		// void add(Matrix4f* m1);
-		// void subtract(Matrix4f* m1);
+		/* Function Declarations for transformations */
+		void transform(Vector3f translate, Vector3f rotate, Vector3f scale);
+		void rotate(float rx, float ry, float rz);
+		void rotate(Vector3f rotation);
+		void scale(float sx, float sy, float sz);
+		void scale(Vector3f scalar);
+		void translate(float x, float y, float z);
+		void translate(Vector3f translation);
+
 		void multiply(Matrix4f* m1);
 		void qrotx(float theta);
 		void qroty(float theta);
 		void qrotz(float theta);
-		void transform(Vector3f translate, Vector3f rotate, Vector3f scale);
-		void scale(float scalar);
-		void scale(Vector3f scalar);
-		void scale(float sx, float sy, float sz);
 		void projection_matrix(float height, float width, float far, float near);
-
-		void rotate(float rx, float ry, float rz);
-		void translate(float x, float y, float z);
 
 		protected:
 	};

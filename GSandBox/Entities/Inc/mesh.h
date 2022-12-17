@@ -44,7 +44,7 @@ namespace mesh {
 		GLuint ebo; // Element buffer object
 		int eboSize;
 		Mesh(GLuint vboId, GLuint eboId);
-		
+
 		~Mesh();
 
 		void load_mesh(string objectFilePath, Vector3f colour);

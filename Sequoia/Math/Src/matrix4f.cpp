@@ -7,48 +7,8 @@
 using namespace matrix4f;
 using namespace vector4f;
 
-void Matrix4f::scale(float scalar) {
-	m[0] = scalar;
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
-
-	m[4] = 0;
-	m[5] = scalar;
-	m[6] = 0;
-	m[7] = 0;
-
-	m[8]  = 0;
-	m[9]  = 0;
-	m[10] = scalar;
-	m[11] = 0;
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
-}
-
 void Matrix4f::scale(Vector3f scalar) {
-	m[0] = scalar.v[0];
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
-
-	m[4] = 0;
-	m[5] = scalar.v[1];
-	m[6] = 0;
-	m[7] = 0;
-
-	m[8]  = 0;
-	m[9]  = 0;
-	m[10] = scalar.v[2];
-	m[11] = 0;
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	scale(scalar.v[0], scalar.v[1], scalar.v[2]);
 }
 
 void Matrix4f::scale(float sx, float sy, float sz) {
@@ -119,6 +79,10 @@ Matrix4f::Matrix4f(float a0, float a1, float a2, float a3, float a4, float a5, f
 	m[13] = a13;
 	m[14] = a14;
 	m[15] = a15;
+}
+
+void Matrix4f::translate(Vector3f translation) {
+	translate(translation.v[0], translation.v[1], translation.v[2]);
 }
 
 void Matrix4f::translate(float x, float y, float z) {
@@ -206,7 +170,7 @@ void Matrix4f::rotate(float rx, float ry, float rz) {
 	rotationZ.m[2]	= 0;
 	rotationZ.m[3]	= 0;
 	rotationZ.m[4]	= sin(rz);
-	rotationZ.m[5]	= cos(rx);
+	rotationZ.m[5]	= cos(rz);
 	rotationZ.m[6]	= 0;
 	rotationZ.m[7]	= 0;
 	rotationZ.m[8]	= 0;
@@ -222,6 +186,10 @@ void Matrix4f::rotate(float rx, float ry, float rz) {
 	multiply(&rotationX);
 	multiply(&rotationY);
 	multiply(&rotationZ);
+}
+
+void Matrix4f::rotate(Vector3f rotation) {
+	rotate(rotation.v[0], rotation.v[1], rotation.v[2]);
 }
 
 void Matrix4f::qrotx(float theta) {
@@ -294,20 +262,19 @@ void Matrix4f::qrotz(float theta) {
 	m[15] = cos(theta);
 }
 
-void Matrix4f::transform(Vector3f translate, Vector3f rotate, Vector3f scale) {
+void Matrix4f::transform(Vector3f translation, Vector3f rotation, Vector3f scalar) {
 
-	Matrix4f translation;
-	translation.translate(translate.v[0], translate.v[1], translate.v[2]);
+	Matrix4f translationMatrix;
+	Matrix4f rotationMatrix;
+	Matrix4f scalarMatrix;
 
-	Matrix4f rotation;
-	rotation.rotate(rotate.v[0], rotate.v[1], rotate.v[2]);
+	translationMatrix.translate(translation);
+	rotationMatrix.rotate(rotation);
+	scalarMatrix.scale(scalar);
 
-	Matrix4f scalar;
-	scalar.scale(scale);
-
-	this->multiply(&rotation);
-	this->multiply(&scalar);
-	this->multiply(&translation);
+	this->multiply(&rotationMatrix);
+	this->multiply(&scalarMatrix);
+	this->multiply(&translationMatrix);
 }
 
 void Matrix4f::projection_matrix(float width, float height, float near, float far) {
@@ -388,69 +355,3 @@ void Matrix4f::print() {
 	printf("(%f %f %f %f\r\n %f %f %f %f\r\n %f %f %f %f\r\n %f %f %f %f)\r\n", m[0], m[1], m[2], m[3], m[4], m[5],
 		   m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
 }
-
-// void Matrix4f::rotatex(float theta) {
-// 	m[0] = 1;
-// 	m[1] = 0;
-// 	m[2] = 0;
-// 	m[3] = 0;
-
-// 	m[4] = 0;
-// 	m[5] = cos(theta);
-// 	m[6] = -sin(theta);
-// 	m[7] = 0;
-
-// 	m[8]  = 0;
-// 	m[9]  = sin(theta);
-// 	m[10] = cos(theta);
-// 	m[11] = 0;
-
-// 	m[12] = 0;
-// 	m[13] = 0;
-// 	m[14] = 0;
-// 	m[15] = 1;
-// }
-
-// void Matrix4f::rotatey(float theta) {
-// 	m[0] = cos(theta);
-// 	m[1] = 0;
-// 	m[2] = sin(theta);
-// 	m[3] = 0;
-
-// 	m[4] = 0;
-// 	m[5] = 1;
-// 	m[6] = 0;
-// 	m[7] = 0;
-
-// 	m[8]  = -sin(theta);
-// 	m[9]  = 0;
-// 	m[10] = cos(theta);
-// 	m[11] = 0;
-
-// 	m[12] = 0;
-// 	m[13] = 0;
-// 	m[14] = 0;
-// 	m[15] = 1;
-// }
-
-// void Matrix4f::rotatez(float theta) {
-// 	m[0] = cos(theta);
-// 	m[1] = -sin(theta);
-// 	m[2] = 0;
-// 	m[3] = 0;
-
-// 	m[4] = sin(theta);
-// 	m[5] = cos(theta);
-// 	m[6] = 0;
-// 	m[7] = 0;
-
-// 	m[8]  = 0;
-// 	m[9]  = 0;
-// 	m[10] = 1;
-// 	m[11] = 0;
-
-// 	m[12] = 0;
-// 	m[13] = 0;
-// 	m[14] = 0;
-// 	m[15] = 1;
-// }

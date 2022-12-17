@@ -34,7 +34,9 @@ namespace vector3f {
 		~Vector3f();
 
 		void set(float xi, float yi, float zi);
+		void set(Vector3f vector);
 		void add(float xi, float yi, float zi);
+		void add(Vector3f vector);
 		void subtract(Vector3f v);
 		float dot(Vector3f v);
 		void print();

@@ -45,10 +45,22 @@ void Vector3f::add(float xi, float yi, float zi) {
 	v[2] += zi;
 }
 
+void Vector3f::add(Vector3f vector) {
+	v[0] += vector.v[0];
+	v[1] += vector.v[1];
+	v[2] += vector.v[2];
+}
+
 void Vector3f::set(float xi, float yi, float zi) {
 	v[0] = xi;
 	v[1] = yi;
 	v[2] = zi;
+}
+
+void Vector3f::set(Vector3f vector) {
+	v[0] = vector.v[0];
+	v[1] = vector.v[1];
+	v[2] = vector.v[2];
 }
 
 void Vector3f::print() {

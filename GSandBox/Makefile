@@ -8,16 +8,25 @@ BUILD_DIR = build
 EXECUTABLE = $(BUILD_DIR)\$(EXECUTABLE_NAME)
 
 # Relative path to GLFW and GLEW sources from this makefile
+# Filtering out the Discards directory from the project build
+# as well becase we don't want these to be compiled
 SEQUOIA_SUB_DIRS = $(wildcard ../Sequoia/*)
-PROJECT_SUB_DIRS = $(wildcard *)
+PROJECT_SUB_DIRS = $(filter-out Discards, $(wildcard *))
 GLEW_DIRECTORY = ../Drivers/GLEW/src
 GLFW_DIRECTORY = ../Drivers/GLFW/src
+$(info Sub dirs $(PROJECT_SUB_DIRS))
+
+# Excluding the Discards folder from the Sequoia folders
+# PROJECT_SUB_DIRS = $(filter-out Discards, $(PROJECT_SUB_DIRS_ALL))
+# $(info Sub dirs $(PROJECT_SUB_DIRS))
+
 # Create list of .cpp sources for each folder
 SEQUOIA_SOURCES = $(strip $(foreach D, $(SEQUOIA_SUB_DIRS), $(wildcard $(D)/Src/*.cpp)))
 PROJECT_SOURCES = $(strip $(foreach D, $(PROJECT_SUB_DIRS), $(wildcard $(D)/Src/*.cpp)))
 GLEW_SOURCES = $(GLEW_DIRECTORY)/glew.c
 GLFW_SOURCES = $(patsubst %.c, $(GLFW_DIRECTORY)/%.c, monitor.c window.c win32_monitor.c win32_window.c init.c input.c context.c \
 win32_init.c win32_thread.c win32_time.c win32_joystick.c wgl_context.c egl_context.c osmesa_context.c vulkan.c)
+
 
 # Create list of .o files from .cpp and .c files
 SEQUOIA_OBJECTS = $(patsubst %.cpp, %.o, $(SEQUOIA_SOURCES))

@@ -18,8 +18,11 @@
 #include "object.h"
 #include "entity.h"
 #include "vector3f.h"
+#include "baseShader.h"
+#include "renderer.h"
 
 using namespace object;
+using namespace renderer;
 
 namespace game {
 
@@ -27,12 +30,17 @@ namespace game {
 
 		// Private variables
 		Object* objects;
-		int numEntities;
-		
-		vector3f::Vector3f cameraPos;
-		vector3f::Vector3f cameraRot;
+		BaseShader* baseShaders;
+		GLuint* vaos;
 
-		GLuint vao;
+		int* objectListSizes;
+
+		int numEntities = 0;
+		int numShaders	= 0;
+		int numVaos		= 0;
+
+		Renderer renderer;
+		Camera camera;
 
 		void render();
 
@@ -47,7 +55,6 @@ namespace game {
 		void render(Object* objects);
 		void detect_keys();
 		void detect_mouse();
-
 	};
 
 } // namespace game
