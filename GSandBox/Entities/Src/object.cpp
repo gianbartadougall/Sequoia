@@ -34,8 +34,6 @@ Object::Object() {}
 
 Object::~Object() {}
 
-/****** START CODE BLOCK ******/
-// Description: TEMP CODE FOR TESTING
 void Object::load(string objectData) {
 
 	// Objects are stored in following format O,shaderId,filePath,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
@@ -54,29 +52,6 @@ void Object::load(string objectData) {
 	this->position.set(stof(data[i + 2]), stof(data[i + 3]), stof(data[i + 4]));
 	this->rotation.set(stof(data[i + 5]), stof(data[i + 6]), stof(data[i + 7]));
 	this->scale.set(stof(data[i + 8]), stof(data[i + 9]), stof(data[i + 10]));
-}
-
-/****** END CODE BLOCK ******/
-
-void Object::load(string objectData, BaseShader* shader) {
-
-	// Objects are stored in following format O,filePath,sid,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
-	// Split the string by delimiter to extract data
-
-	string data[11];
-	strUtils.split_string(objectData, data, 0, ',');
-
-	// Load the object
-	cout << "loading model: ../Resources/Models/" << data[1] << endl;
-	load_mesh("../Resources/Models/" + data[1], this);
-
-	// Assign a pointer to the shader
-	this->shader = shader;
-
-	// Set the initial position of this object
-	this->position.set(stof(data[2]), stof(data[3]), stof(data[4]));
-	this->rotation.set(stof(data[5]), stof(data[6]), stof(data[7]));
-	this->scale.set(stof(data[8]), stof(data[9]), stof(data[10]));
 }
 
 void Object::load_mesh(string filePath, Entity* entity) {
@@ -158,18 +133,6 @@ void Object::load_mesh(string filePath, Entity* entity) {
 	// Bind the vbo for this mesh to make them active
 	glBindBuffer(GL_ARRAY_BUFFER, entity->vbo);
 
-	/**
-	 * @param1: The vao these settings will be saved in
-	 * @param2: The number of components per vertex. Using 3D graphics => each vertex has x,y,z components
-	 * @param3: The data type of each component in the vbo
-	 * @param4: Whether the data should be normalised or not -> NOT ACTUALLY SURE WHAT THIS MEANS
-	 * @param5: The number of data points associated to each vertex. Each vertex has an x,y,z location and a r,g,b
-	 * colour
-	 * @param6: The offset of when to start reading the data from the vbo
-	 */
-	// glVertexAttribPointer(this->vao, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GL_FLOAT), 0);
-	// glBindAttribLocation(shaderProgram, this->vao, "position");
-
 	// Store vertex data into the current active vertex buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
 
@@ -177,6 +140,4 @@ void Object::load_mesh(string filePath, Entity* entity) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, entity->ebo);
 	// Store element data into the current active element buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elementData), elementData, GL_STATIC_DRAW);
-
-	log.log_message("Finished loading object");
 }

@@ -29,7 +29,6 @@
 
 /* Private Includes */
 #include "game.h"
-#include "shaderLoader.h"
 #include "debugLog.h"
 #include "matrix4f.h"
 #include "vector4f.h"
@@ -43,7 +42,6 @@ using namespace std::chrono;
 using namespace debugLog;
 using namespace objectLoader;
 using namespace object;
-using namespace shaderLoader;
 using namespace baseShader;
 
 /* Private Marcos */
@@ -106,24 +104,8 @@ void Game::run() {
 	// Load everything in the game (only consists of objects at the moment)
 	load_game(TEST_GAME);
 
-	// shaderLoader::ShaderLoader sl;
-	// sl.load_baseshader("S,Shaders/mvertex_shader.glsl,Shaders/fragment_shader.glsl", &shader);
-	// glUseProgram(shader.programId);
-	// GLuint programId = sl.load_shader(vertexShaderPath, fragmentShaderPath);
-	/****** START CODE BLOCK ******/
-	// Description: Loading the projection matrix into the vertex shader. This only needs to be done once at the
-	// start because the projection matrix should never need to change
-
-	// matrix4f::Matrix4f projMat;
-	// projMat.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 10);
-	// GLint projectionMatrix = glGetUniformLocation(this->objects[0].shader->programId, "projectionMatrix");
-	// glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, projMat.m);
-
-	/****** END CODE BLOCK ******/
-
-	for (int i = 0; i < this->numEntities; i++) {
-		cout << "vbo: " << this->objects[i].vbo << endl;
-		cout << "ebo: " << this->objects[i].ebo << endl;
+	for (int i = 0; i < numEntities; i++) {
+		objects[i].print();
 	}
 
 	// Run main game loop until the user closes the window
@@ -133,7 +115,6 @@ void Game::run() {
 
 		/* Render here */
 		renderer.render(this->vaos, numVaos, &camera, objects, objectListSizes);
-		// render(this->objects);
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -163,51 +144,7 @@ void Game::run() {
 	glfwTerminate();
 }
 
-void Game::render(Object* objects) {
-
-	// Clear the screen to bloack
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // WHAT DOES THIS DO??
-
-	// All the objects use the same shader program for the moment
-	GLuint programId;
-	if (this->numEntities > 0) {
-		programId = objects[0].shader->programId;
-		glUseProgram(programId);
-	}
-
-	for (int i = 0; i < this->numEntities; i++) {
-
-		if (objects[i].shader->programId != programId) {
-			programId = objects[i].shader->programId;
-			glUseProgram(programId);
-		}
-
-		// Update the uniforms so the correct values are loaded in the shaders for this object
-
-		// Create transformation matrix. The rotation and scale must preceed the translation otherwise the resultant
-		// matrix will distort the object because scale and rotating must happen when the object is at(0, 0, 0)
-		matrix4f::Matrix4f tMat;
-		tMat.scale(objects[i].scale);
-		tMat.rotate(objects[i].rotation);
-		tMat.translate(objects[i].position);
-		glUniformMatrix4fv(5, 1, GL_FALSE, tMat.m);
-
-		matrix4f::Matrix4f vMat;
-		vMat.rotate(this->camera.rotation);
-		vMat.translate(this->camera.position);
-		glUniformMatrix4fv(1, 1, GL_FALSE, vMat.m);
-
-		// glBindVertexArray(this->vao);
-		glBindBuffer(GL_ARRAY_BUFFER, objects[i].vbo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[i].ebo);
-		glDrawElements(GL_TRIANGLES, objects[i].eboSize, GL_UNSIGNED_INT, 0); // Draw triangle
-	}
-}
-
 void Game::load_game(string filePath) {
-
-	ShaderLoader shaderLoader;
 
 	// Confirm given file path exists
 	std::ifstream gameFile(filePath);
@@ -252,7 +189,6 @@ void Game::load_game(string filePath) {
 	}
 
 	string shaders[numShaders];
-	int objectShaderIds[numEntities];
 
 	int objIndex = 0;
 	int si		 = 0;
@@ -269,24 +205,19 @@ void Game::load_game(string filePath) {
 		}
 
 		if (SHADER(line)) {
-			log.log_warning("here");
 			shaders[si] = line;
-			log.log_warning("here 2");
 			si++;
 			continue;
 		}
 
 		if (OBJECT(line)) {
 			this->objectListSizes[vi - 1]++;
-			// objects[objIndex].load(line, &baseShaders[si - 1]);
 			objects[objIndex].load(line);
-			objectShaderIds[objIndex] = si;
+			objects[objIndex].loadShaderId = si;
 			objIndex++;
 			continue;
 		}
 	}
-
-	log.log_message("Got here");
 
 	// Load shaders. It is important that this is done after all the vbos and vaos have been generated
 	for (int i = 0; i < numShaders; i++) {
@@ -295,13 +226,15 @@ void Game::load_game(string filePath) {
 
 		for (int j = 0; j < numEntities; j++) {
 			if (objects[j].loadShaderId == i) {
-				log.log_message("Loading shader");
 				objects[j].load_shader(&baseShaders[i]);
-				log.log_message("loaded shader");
-				baseShaders[i].print();
 			}
 		}
 	}
+
+	gameFile.close();
+
+	// Unbind vao
+	glBindVertexArray(0);
 }
 
 void Game::detect_mouse() {
@@ -314,19 +247,19 @@ void Game::detect_mouse() {
 	}
 
 	if (xpos < (WINDOW_WIDTH / 2)) {
-		camera.rotation.add(0, 0.001, 0);
+		camera.rotation.add(0, 0.005, 0);
 	}
 
 	if (xpos > (WINDOW_WIDTH / 2)) {
-		camera.rotation.add(0, -0.001, 0);
+		camera.rotation.add(0, -0.005, 0);
 	}
 
 	if (ypos < (WINDOW_HEIGHT / 2)) {
-		camera.rotation.add(0.001, 0, 0);
+		camera.rotation.add(0.005, 0, 0);
 	}
 
 	if (ypos > (WINDOW_HEIGHT / 2)) {
-		camera.rotation.add(-0.001, 0, 0);
+		camera.rotation.add(-0.005, 0, 0);
 	}
 
 	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -342,21 +275,21 @@ void Game::detect_keys() {
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		// Move the camera to the left
-		camera.position.add(0.001, 0, 0);
+		camera.position.add(0.0005, 0, 0);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		// Move the camera to the right
-		camera.position.add(-0.001, 0, 0);
+		camera.position.add(-0.0005, 0, 0);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		// Move the camera forward
-		camera.position.add(0, 0, 0.001);
+		camera.position.add(0, 0, 0.0005);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		// Move the camera backward
-		camera.position.add(0, 0, -0.001);
+		camera.position.add(0, 0, -0.0005);
 	}
 }

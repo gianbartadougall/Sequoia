@@ -40,7 +40,7 @@ void Renderer::load_generic_shader_values(Entity* entity) {
 }
 
 void Renderer::load_object_shader_values(Object* object) {
-	// object->shader->print();
+
 	/* Load Generic Shader Values */
 	load_generic_shader_values(object);
 
@@ -49,9 +49,9 @@ void Renderer::load_object_shader_values(Object* object) {
 
 void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* objectListSizes, Camera* camera) {
 
-	matrix4f::Matrix4f vMat;
-	vMat.rotate(camera->rotation);
-	vMat.translate(camera->position);
+	// matrix4f::Matrix4f vMat;
+	// vMat.rotate(camera->rotation);
+	// vMat.translate(camera->position);
 
 	// Loop through every vao and render the all the objects associated with
 	// that vao
@@ -60,9 +60,9 @@ void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* o
 
 		// Binding and enabling the vao so that OpenGL uses that vao when
 		// the function to draw the objects are called
-		// glBindVertexArray(vaos[vi]);
-		// glEnableVertexArrayAttrib();
-		glUniformMatrix4fv(objects[offset].shader->viewMatrixLocation, 1, GL_FALSE, vMat.m);
+		glBindVertexArray(vaos[vi]);
+
+		// glUniformMatrix4fv(objects[offset].shader->viewMatrixLocation, 1, GL_FALSE, vMat.m);
 
 		// Draw every object that is associated to the currently bound vao
 		for (int j = 0; j < objectListSizes[vi]; j++) {
@@ -83,18 +83,32 @@ void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* o
 			}
 
 			// Update the shaders with the values of the current object to be rendered
-			load_object_shader_values(&objects[k]);
+			// load_object_shader_values(&objects[k]);
+			Matrix4f transformationMatrix;
+			transformationMatrix.scale(objects[k].scale);
+			transformationMatrix.rotate(objects[k].rotation);
+			transformationMatrix.translate(objects[k].position);
+
+			transformationMatrix.translate(-camera->position.v[0], -camera->position.v[1], -camera->position.v[2]);
+			transformationMatrix.rotate(camera->rotation);
+			transformationMatrix.translate(camera->position);
+
+			transformationMatrix.translate(camera->position);
+			glUniformMatrix4fv(objects[k].shader->transformationMatrixLocation, 1, GL_FALSE, transformationMatrix.m);
 
 			// Draw the object. The last argument specifiies where OpenGL should
 			// start reading the vertecies from in the vbo
-			glBindBuffer(GL_ARRAY_BUFFER, objects[k].vbo);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[k].ebo);
+			// glBindBuffer(GL_ARRAY_BUFFER, objects[k].vbo);
+			// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[k].ebo);
 			glDrawElements(GL_TRIANGLES, objects[k].eboSize, GL_UNSIGNED_INT, 0);
 		}
 
 		// Add to offset so the next loop starts at the correct index
 		offset += objectListSizes[vi];
 	}
+
+	// Unbind vertex array
+	glBindVertexArray(0);
 }
 
 void Renderer::render(GLuint* vaos, int numVaos, Camera* camera, Object* objects, int* numObjects) {

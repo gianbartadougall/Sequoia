@@ -56,6 +56,7 @@ namespace entity {
 		Entity();
 		~Entity();
 
+		void print();
 		void load_shader(BaseShader* shader);
 	};
 } // namespace entity

@@ -20,9 +20,11 @@
 #include "vector3f.h"
 #include "baseShader.h"
 #include "renderer.h"
+#include "shaderLoader.h"
 
 using namespace object;
 using namespace renderer;
+using namespace shaderLoader;
 
 namespace game {
 
@@ -41,9 +43,7 @@ namespace game {
 
 		Renderer renderer;
 		Camera camera;
-
-		void render();
-
+		ShaderLoader shaderLoader;
 		debugLog::DebugLog log;
 
 		public:

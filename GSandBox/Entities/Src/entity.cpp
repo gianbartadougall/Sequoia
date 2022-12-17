@@ -11,6 +11,7 @@
  */
 
 /* Public Includes */
+#include <iostream>
 
 /* GLEW Includes */
 
@@ -22,6 +23,7 @@
 /* Private Enumerations and Structures */
 
 using namespace entity;
+using namespace std;
 
 Entity::Entity() {
 
@@ -39,4 +41,10 @@ Entity::~Entity() {
 
 void Entity::load_shader(BaseShader* shader) {
 	this->shader = shader;
+}
+
+void Entity::print() {
+	cout << "Vbo: " << vbo << endl;
+	cout << "Ebo: " << ebo << endl;
+	cout << "Ebo size: " << eboSize << endl;
 }
