@@ -27,6 +27,7 @@ namespace matrix4f {
 		~Matrix4f();
 
 		void print();
+		void set_to_identity();
 
 		/* Function Declarations for transformations */
 		void transform(Vector3f translate, Vector3f rotate, Vector3f scale);

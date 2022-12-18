@@ -12,73 +12,95 @@ void Matrix4f::scale(Vector3f scalar) {
 }
 
 void Matrix4f::scale(float sx, float sy, float sz) {
-	m[0] = sx;
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
+	this->m[0] = sx;
+	this->m[1] = 0;
+	this->m[2] = 0;
+	this->m[3] = 0;
 
-	m[4] = 0;
-	m[5] = sy;
-	m[6] = 0;
-	m[7] = 0;
+	this->m[4] = 0;
+	this->m[5] = sy;
+	this->m[6] = 0;
+	this->m[7] = 0;
 
-	m[8]  = 0;
-	m[9]  = 0;
-	m[10] = sz;
-	m[11] = 0;
+	this->m[8]	= 0;
+	this->m[9]	= 0;
+	this->m[10] = sz;
+	this->m[11] = 0;
 
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	this->m[12] = 0;
+	this->m[13] = 0;
+	this->m[14] = 0;
+	this->m[15] = 1;
 }
 
 Matrix4f::~Matrix4f() {}
 
 Matrix4f::Matrix4f() {
-	m[0] = 1;
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
+	this->m[0] = 1;
+	this->m[1] = 0;
+	this->m[2] = 0;
+	this->m[3] = 0;
 
-	m[4] = 0;
-	m[5] = 1;
-	m[6] = 0;
-	m[7] = 0;
+	this->m[4] = 0;
+	this->m[5] = 1;
+	this->m[6] = 0;
+	this->m[7] = 0;
 
-	m[8]  = 0;
-	m[9]  = 0;
-	m[10] = 1;
-	m[11] = 0;
+	this->m[8]	= 0;
+	this->m[9]	= 0;
+	this->m[10] = 1;
+	this->m[11] = 0;
 
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	this->m[12] = 0;
+	this->m[13] = 0;
+	this->m[14] = 0;
+	this->m[15] = 1;
+}
+
+void Matrix4f::set_to_identity() {
+	this->m[0] = 1;
+	this->m[1] = 0;
+	this->m[2] = 0;
+	this->m[3] = 0;
+
+	this->m[4] = 0;
+	this->m[5] = 1;
+	this->m[6] = 0;
+	this->m[7] = 0;
+
+	this->m[8]	= 0;
+	this->m[9]	= 0;
+	this->m[10] = 1;
+	this->m[11] = 0;
+
+	this->m[12] = 0;
+	this->m[13] = 0;
+	this->m[14] = 0;
+	this->m[15] = 1;
 }
 
 Matrix4f::Matrix4f(float a0, float a1, float a2, float a3, float a4, float a5, float a6, float a7, float a8, float a9,
 				   float a10, float a11, float a12, float a13, float a14, float a15) {
 
-	m[0] = a0;
-	m[1] = a1;
-	m[2] = a2;
-	m[3] = a3;
+	this->m[0] = a0;
+	this->m[1] = a1;
+	this->m[2] = a2;
+	this->m[3] = a3;
 
-	m[4] = a4;
-	m[5] = a5;
-	m[6] = a6;
-	m[7] = a7;
+	this->m[4] = a4;
+	this->m[5] = a5;
+	this->m[6] = a6;
+	this->m[7] = a7;
 
-	m[8]  = a8;
-	m[9]  = a9;
-	m[10] = a10;
-	m[11] = a11;
+	this->m[8]	= a8;
+	this->m[9]	= a9;
+	this->m[10] = a10;
+	this->m[11] = a11;
 
-	m[12] = a12;
-	m[13] = a13;
-	m[14] = a14;
-	m[15] = a15;
+	this->m[12] = a12;
+	this->m[13] = a13;
+	this->m[14] = a14;
+	this->m[15] = a15;
 }
 
 void Matrix4f::translate(Vector3f translation) {
@@ -195,71 +217,71 @@ void Matrix4f::rotate(Vector3f rotation) {
 void Matrix4f::qrotx(float theta) {
 	float ct = cos(0.01);
 
-	m[0] = 1;
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
+	this->m[0] = 1;
+	this->m[1] = 0;
+	this->m[2] = 0;
+	this->m[3] = 0;
 
-	m[4] = 0;
-	m[5] = -1;
-	m[6] = -2 * ct;
-	m[7] = 0;
+	this->m[4] = 0;
+	this->m[5] = -1;
+	this->m[6] = -2 * ct;
+	this->m[7] = 0;
 
-	m[8]  = 0;
-	m[9]  = 2 * ct;
-	m[10] = -1;
-	m[11] = 0;
+	this->m[8]	= 0;
+	this->m[9]	= 2 * ct;
+	this->m[10] = -1;
+	this->m[11] = 0;
 
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
-	m[15] = 1;
+	this->m[12] = 0;
+	this->m[13] = 0;
+	this->m[14] = 0;
+	this->m[15] = 1;
 }
 
 void Matrix4f::qroty(float theta) {
 
-	m[0] = cos(theta);
-	m[1] = 0;
-	m[2] = -sin(theta);
-	m[3] = 0;
+	this->m[0] = cos(theta);
+	this->m[1] = 0;
+	this->m[2] = -sin(theta);
+	this->m[3] = 0;
 
-	m[4] = 0;
-	m[5] = cos(theta);
-	m[6] = 0;
-	m[7] = sin(theta);
+	this->m[4] = 0;
+	this->m[5] = cos(theta);
+	this->m[6] = 0;
+	this->m[7] = sin(theta);
 
-	m[8]  = sin(theta);
-	m[9]  = 0;
-	m[10] = cos(theta);
-	m[11] = 0;
+	this->m[8]	= sin(theta);
+	this->m[9]	= 0;
+	this->m[10] = cos(theta);
+	this->m[11] = 0;
 
-	m[12] = 0;
-	m[13] = sin(theta);
-	m[14] = 0;
-	m[15] = cos(theta);
+	this->m[12] = 0;
+	this->m[13] = sin(theta);
+	this->m[14] = 0;
+	this->m[15] = cos(theta);
 }
 
 void Matrix4f::qrotz(float theta) {
 
-	m[0] = cos(theta);
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = -sin(theta);
+	this->m[0] = cos(theta);
+	this->m[1] = 0;
+	this->m[2] = 0;
+	this->m[3] = -sin(theta);
 
-	m[4] = 0;
-	m[5] = cos(theta);
-	m[6] = -sin(theta);
-	m[7] = 0;
+	this->m[4] = 0;
+	this->m[5] = cos(theta);
+	this->m[6] = -sin(theta);
+	this->m[7] = 0;
 
-	m[8]  = 0;
-	m[9]  = sin(theta);
-	m[10] = cos(theta);
-	m[11] = 0;
+	this->m[8]	= 0;
+	this->m[9]	= sin(theta);
+	this->m[10] = cos(theta);
+	this->m[11] = 0;
 
-	m[12] = 0;
-	m[13] = sin(theta);
-	m[14] = 0;
-	m[15] = cos(theta);
+	this->m[12] = 0;
+	this->m[13] = sin(theta);
+	this->m[14] = 0;
+	this->m[15] = cos(theta);
 }
 
 void Matrix4f::transform(Vector3f translation, Vector3f rotation, Vector3f scalar) {
@@ -285,25 +307,25 @@ void Matrix4f::projection_matrix(float width, float height, float near, float fa
 	float right		  = top * aspectRatio;
 	float left		  = -right;
 
-	m[0] = (2 * near) / (right - left);
-	m[1] = 0;
-	m[2] = 0;
-	m[3] = 0;
+	this->m[0] = (2 * near) / (right - left);
+	this->m[1] = 0;
+	this->m[2] = 0;
+	this->m[3] = 0;
 
-	m[4] = 0;
-	m[5] = (2 * near) / (top - bottom);
-	m[6] = 0;
-	m[7] = 0;
+	this->m[4] = 0;
+	this->m[5] = (2 * near) / (top - bottom);
+	this->m[6] = 0;
+	this->m[7] = 0;
 
-	m[8]  = (right + left) / (right - left);
-	m[9]  = (top + bottom) / (top - bottom);
-	m[10] = -(far + near) / (far - near);
-	m[11] = -1;
+	this->m[8]	= (right + left) / (right - left);
+	this->m[9]	= (top + bottom) / (top - bottom);
+	this->m[10] = -(far + near) / (far - near);
+	this->m[11] = -1;
 
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = -(2 * far * near) / (far - near);
-	m[15] = 0;
+	this->m[12] = 0;
+	this->m[13] = 0;
+	this->m[14] = -(2 * far * near) / (far - near);
+	this->m[15] = 0;
 }
 
 void Matrix4f::multiply(Matrix4f* m1) {
@@ -330,25 +352,25 @@ void Matrix4f::multiply(Matrix4f* m1) {
 	matrix.m[14] = (m[12] * m1->m[2]) + (m[13] * m1->m[6]) + (m[14] * m1->m[10]) + (m[15] * m1->m[14]);
 	matrix.m[15] = (m[12] * m1->m[3]) + (m[13] * m1->m[7]) + (m[14] * m1->m[11]) + (m[15] * m1->m[15]);
 
-	m[0] = matrix.m[0];
-	m[1] = matrix.m[1];
-	m[2] = matrix.m[2];
-	m[3] = matrix.m[3];
+	this->m[0] = matrix.m[0];
+	this->m[1] = matrix.m[1];
+	this->m[2] = matrix.m[2];
+	this->m[3] = matrix.m[3];
 
-	m[4] = matrix.m[4];
-	m[5] = matrix.m[5];
-	m[6] = matrix.m[6];
-	m[7] = matrix.m[7];
+	this->m[4] = matrix.m[4];
+	this->m[5] = matrix.m[5];
+	this->m[6] = matrix.m[6];
+	this->m[7] = matrix.m[7];
 
-	m[8]  = matrix.m[8];
-	m[9]  = matrix.m[9];
-	m[10] = matrix.m[10];
-	m[11] = matrix.m[11];
+	this->m[8]	= matrix.m[8];
+	this->m[9]	= matrix.m[9];
+	this->m[10] = matrix.m[10];
+	this->m[11] = matrix.m[11];
 
-	m[12] = matrix.m[12];
-	m[13] = matrix.m[13];
-	m[14] = matrix.m[14];
-	m[15] = matrix.m[15];
+	this->m[12] = matrix.m[12];
+	this->m[13] = matrix.m[13];
+	this->m[14] = matrix.m[14];
+	this->m[15] = matrix.m[15];
 }
 
 void Matrix4f::print() {

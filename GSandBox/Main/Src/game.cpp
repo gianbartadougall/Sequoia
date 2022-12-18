@@ -134,7 +134,7 @@ void Game::run() {
 		/****** START CODE BLOCK ******/
 		// Description: Manipulate the orientation, position and scale of the objects in the scene
 		for (int i = 0; i < this->numEntities; i++) {
-			objects[i].rotation.add(0.000, 0.0001, 0.000);
+			// objects[i].rotation.add(0.000, 0.0001, 0.000);
 		}
 
 		/****** END CODE BLOCK ******/
