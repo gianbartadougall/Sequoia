@@ -30,6 +30,12 @@ namespace camera {
 	class Camera {
 
 		// Private variables
+		void translate(Vector3f translation);
+		void rotate(Vector3f rotation);
+
+		Vector3f iUnitVector;
+		Vector3f jUnitVector;
+		Vector3f kUnitVector;
 
 		public:
 		Camera();
@@ -38,8 +44,15 @@ namespace camera {
 		Vector3f position;
 		Vector3f rotation;
 
-		void translate(Vector3f translation);
-		void rotate(Vector3f rotation);
+		void move_left();
+		void move_right();
+		void move_forward();
+		void move_backward();
+
+		void rotate_left();
+		void rotate_right();
+		void rotate_up();
+		void rotate_down();
 	};
 } // namespace camera
 

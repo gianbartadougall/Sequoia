@@ -246,20 +246,25 @@ void Game::detect_mouse() {
 		return;
 	}
 
+	// Problem is that I have static acis. Maybe need to use quaternions for this? Might be far easier
 	if (xpos < (WINDOW_WIDTH / 2)) {
-		camera.rotation.add(0, 0.005, 0);
+		camera.rotate_left();
+		// camera.rotation.add(0, 0.005, 0);
 	}
 
 	if (xpos > (WINDOW_WIDTH / 2)) {
-		camera.rotation.add(0, -0.005, 0);
+		camera.rotate_right();
+		// camera.rotation.add(0, -0.005, 0);
 	}
 
 	if (ypos < (WINDOW_HEIGHT / 2)) {
-		camera.rotation.add(0.005, 0, 0);
+		camera.rotate_up();
+		// camera.rotation.add(0.005, 0, 0);
 	}
 
 	if (ypos > (WINDOW_HEIGHT / 2)) {
-		camera.rotation.add(-0.005, 0, 0);
+		camera.rotate_down();
+		// camera.rotation.add(-0.005, 0, 0);
 	}
 
 	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -275,21 +280,21 @@ void Game::detect_keys() {
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		// Move the camera to the left
-		camera.position.add(0.0005, 0, 0);
+		camera.move_left();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		// Move the camera to the right
-		camera.position.add(-0.0005, 0, 0);
+		camera.move_right();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		// Move the camera forward
-		camera.position.add(0, 0, 0.0005);
+		camera.move_forward();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		// Move the camera backward
-		camera.position.add(0, 0, -0.0005);
+		camera.move_backward();
 	}
 }
