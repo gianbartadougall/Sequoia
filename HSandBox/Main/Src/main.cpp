@@ -5,14 +5,14 @@
 
 using namespace game;
 
-int hello(void);
+//int hello(void);
 
 int main(void) {
 
-    std::cout << "The number is " << hello() << std::endl;
+    std::cout << "The number is " << std::endl;
 
-    // Game game;
-    // game.run();
+    Game game;
+    game.run();
     
     return 0;
 
