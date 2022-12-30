@@ -25,9 +25,28 @@ using namespace game;
 // using namespace matrix4f;
 using namespace std::chrono;
 
+GLFWwindow* window;
+
 /* Private Function Declartations */
 
 Game::Game() {
+    char window_title[100] = "EPIC_PHYSICS_SIMULATION\0";
+
+    /* Initialize the library */
+    if (!glfwInit()) {
+        std::cout << "failed to initalise glfw" << std::endl;
+        exit(1);
+    }
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(640, 480, window_title, NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        std::cout << "window failed to launch" << std::endl;
+        exit(1);
+    }
+
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
 
 }
 
@@ -36,26 +55,11 @@ Game::~Game() {
 }
 
 uint8_t Game::run() {
-    GLFWwindow* window;
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return 1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return 1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
+    int frames = 0;
+    system_clock::time_point time1 = system_clock::now();
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -64,35 +68,6 @@ uint8_t Game::run() {
 
         /* Poll for and process events */
         glfwPollEvents();
-    }
-
-    glfwTerminate();
-    GLuint vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    printf("%u\n", vertexBuffer);
-    return 0;
-    // Creating a new matrix testing
-    // Matrix4f m1, m2;
-    // m1.scale(2);
-    // m2.scale(3);
-    // m1.multiply(&m2);
-    // m1.print()
-    const char* vertexSource = R"glsl(
-    #version 150 core
-
-    in vec2 position;
-
-    void main()
-    {
-        gl_Position = vec4(position, 0.0, 1.0);
-    }
-    )glsl";
-
-
-    int frames = 0;
-    system_clock::time_point time1 = system_clock::now();
-    // Create a game loop
-    while (1) {
 
         // Print the FPS
         auto elapsedTime = duration_cast<milliseconds>(system_clock::now() - time1);
@@ -103,6 +78,11 @@ uint8_t Game::run() {
         }
 
         frames++;
+    }
+
+
+    // Create a game loop
+    while (1) {
     }
 
 }

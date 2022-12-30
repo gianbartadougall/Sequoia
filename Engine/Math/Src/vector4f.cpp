@@ -9,7 +9,9 @@ Vector4f::Vector4f() {
 	z = 0;
 }
 
-Vector4f::~Vector4f() {}
+Vector4f::~Vector4f() {
+	
+}
 
 Vector4f::Vector4f(float xi, float yi, float zi) {
 	x = xi;

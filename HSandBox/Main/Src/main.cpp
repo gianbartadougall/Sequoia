@@ -9,9 +9,10 @@ using namespace game;
 
 int main(void) {
 
-    std::cout << "The number is " << std::endl;
+    std::cout << "The main function ran" << std::endl;
 
     Game game;
+    std::cout << "initalisised instance of class" << std::endl;
     game.run();
     
     return 0;

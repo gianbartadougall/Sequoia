@@ -3,9 +3,7 @@
 set num=0
 set errorFile=errLog.txt
 set verboseFlag=-v
-set debugFlag=-d
 set verbose=0
-set debug=0
 
 for %%x in (%*) do (
     Set /A num+=1
@@ -13,10 +11,6 @@ for %%x in (%*) do (
     :: Check if any of the arguments passed in is the verbose flag argument
     if "%%x"=="%verboseFlag%" (
         set verbose=1
-    )
-
-    if "%%x"=="%debugFlag%" (
-        set debug=1
     )
 )
 
@@ -45,6 +39,7 @@ if %num%==3 (
             call :runIfNoError %1_run
 
         ) else (
+            
             make %1 > NUL 2> %errorFile%
             call :runIfNoError %1_run
         )
@@ -59,21 +54,9 @@ if %num%==3 (
             make %1 2> %errorFile%
             call :runIfNoError %1_run
 
-            goto :exit
-        ) 
-        
-        if "%debug%"=="1" (
-            
-            if "%1"=="gian" (
-                gdb GSandBox/build/GianSandBox.exe
-                
-                goto :exit
-            )
-
-            goto :exit
+        ) else (
+            call :secondArg %1 %2
         )
-        
-        call :secondArg %1 %2
 
         goto :exit
     )
