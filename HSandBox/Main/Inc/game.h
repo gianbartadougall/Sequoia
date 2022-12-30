@@ -22,7 +22,7 @@ namespace game {
 		Game();
 		~Game();
 
-		uint8_t run();
+		void run();
 
 	};
 }

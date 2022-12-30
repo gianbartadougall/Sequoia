@@ -14,12 +14,13 @@
 // #include <ctime>    
 
 /* Private Includes */
-#include "game.h"
 #define GLEW_STATIC
-//#define GLFW_DLL
 #include "GL/glew.h"
+
 #include "GLFW/glfw3.h"
+
 // #include "matrix4f.h"
+#include "game.h"
 
 using namespace game;
 // using namespace matrix4f;
@@ -30,7 +31,6 @@ GLFWwindow* window;
 /* Private Function Declartations */
 
 Game::Game() {
-    char window_title[100] = "EPIC_PHYSICS_SIMULATION\0";
 
     /* Initialize the library */
     if (!glfwInit()) {
@@ -38,7 +38,7 @@ Game::Game() {
         exit(1);
     }
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, window_title, NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Sequoia", NULL, NULL);
     if (!window) {
         glfwTerminate();
         std::cout << "window failed to launch" << std::endl;
@@ -48,41 +48,43 @@ Game::Game() {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    if (glewInit() != GLEW_OK) {
+        std::cout << "GLEW didnt init properly" << std::endl;
+        exit(1);
+    }
+
 }
 
 Game::~Game() {
 
 }
 
-uint8_t Game::run() {
+void Game::run() {
 
     int frames = 0;
-    system_clock::time_point time1 = system_clock::now();
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window)) {
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
-
-        // Print the FPS
-        auto elapsedTime = duration_cast<milliseconds>(system_clock::now() - time1);
-        if (elapsedTime.count() >= 1000) {
-            std::cout << "FPS: " << frames << std::endl;
-            frames = 0;
-            time1 = system_clock::now();
-        }
-
-        frames++;
-    }
+	system_clock::time_point time1 = system_clock::now();
 
 
-    // Create a game loop
-    while (1) {
-    }
+	// Run main game loop until the user closes the window
+	while (!glfwWindowShouldClose(window)) {
 
+		/* Swap front and back buffers */
+		glfwSwapBuffers(window);
+
+		/* Poll for and process events */
+		glfwPollEvents();
+
+		// Print the FPS
+		auto elapsedTime = duration_cast<milliseconds>(system_clock::now() - time1);
+
+		if (elapsedTime.count() >= 1000) {
+			std::cout << "FPS: " << frames << std::endl;
+			frames = 0;
+			time1  = system_clock::now();
+		}
+
+		frames++;
+	}
+
+	glfwTerminate();
 }
