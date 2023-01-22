@@ -36,6 +36,7 @@ namespace camera {
 		Vector3f iUnitVector;
 		Vector3f jUnitVector;
 		Vector3f kUnitVector;
+		Vector3f jUnitVectorNeg;
 
 		public:
 		Camera();

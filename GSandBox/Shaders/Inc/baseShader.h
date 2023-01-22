@@ -41,6 +41,8 @@ namespace baseShader {
 		GLuint transformationMatrixLocation;
 		GLuint projectionMatrixLocation;
 		GLuint viewMatrixLocation;
+		GLuint cameraRotationLocation;
+		GLuint cameraPositionLocation;
 
 		void print();
 	};

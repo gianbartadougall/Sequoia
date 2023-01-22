@@ -36,6 +36,7 @@
 #include "array.h"
 #include "gameSettings.h"
 #include "baseShader.h"
+#include "mathUtils.h"
 
 using namespace game;
 using namespace std::chrono;
@@ -55,9 +56,7 @@ GLFWwindow* window;
 BaseShader shader;
 
 // Shader sources
-std::string vertexShaderPath   = "Shaders/mvertex_shader.glsl";
-std::string fragmentShaderPath = "Shaders/fragment_shader.glsl";
-std::string TEST_GAME		   = "../Resources/Games/test_game.txt";
+std::string TEST_GAME = "../Resources/Games/test_game.txt";
 
 /* Private Function Declartations */
 
@@ -249,22 +248,18 @@ void Game::detect_mouse() {
 	// Problem is that I have static acis. Maybe need to use quaternions for this? Might be far easier
 	if (xpos < (WINDOW_WIDTH / 2)) {
 		camera.rotate_left();
-		// camera.rotation.add(0, 0.005, 0);
 	}
 
 	if (xpos > (WINDOW_WIDTH / 2)) {
 		camera.rotate_right();
-		// camera.rotation.add(0, -0.005, 0);
 	}
 
 	if (ypos < (WINDOW_HEIGHT / 2)) {
 		camera.rotate_up();
-		// camera.rotation.add(0.005, 0, 0);
 	}
 
 	if (ypos > (WINDOW_HEIGHT / 2)) {
 		camera.rotate_down();
-		// camera.rotation.add(-0.005, 0, 0);
 	}
 
 	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);

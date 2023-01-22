@@ -12,6 +12,7 @@
 
 /* Public Includes */
 #include <iostream>
+#include <cmath>
 
 /* GLEW Includes */
 
@@ -106,11 +107,34 @@ float Vector3f::z() {
 }
 
 void Vector3f::print() {
-	cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")" << endl;
+	cout << "(" << this->v[0] << ", " << this->v[1] << ", " << this->v[2] << ")" << endl;
 }
 
-static Vector3f cross(Vector3f v1, Vector3f v2) {
-	v1.v[0] = ((v2.z() * v1.y()) - (v2.y() * v1.z()));
-	v1.v[1] = ((v2.x() * v1.z()) - (v2.z() * v1.x()));
-	v1.v[2] = ((v2.y() * v1.x()) - (v2.x() * v1.y()));
+float Vector3f::dot(Vector3f v) {
+	return (this->v[0] * v.v[0]) + (this->v[1] * v.v[1]) + (this->v[2] * v.v[2]);
+}
+
+float Vector3f::magnitude() {
+	return sqrt((this->v[0] * this->v[0]) + (this->v[1] * this->v[1]) + (this->v[2] * this->v[2]));
+}
+
+void Vector3f::normalise() {
+
+	float length = this->magnitude();
+	this->v[0] /= length;
+	this->v[1] /= length;
+	this->v[2] /= length;
+}
+void Vector3f::rotate(float angle, Vector3f u) {
+
+	float val = (1 - cos(angle)) * dot(u);
+
+	// Compute the resultant values for each axis
+	float vx = cos(angle) * v[0] + val * u.v[0] + (sin(angle) * ((u.v[1] * v[2]) - (u.v[2] * v[1])));
+	float vy = cos(angle) * v[1] + val * u.v[1] + (sin(angle) * ((u.v[2] * v[0]) - (u.v[0] * v[2])));
+	float vz = cos(angle) * v[2] + val * u.v[2] + (sin(angle) * ((u.v[0] * v[1]) - (u.v[1] * v[0])));
+	
+	this->v[0] = vx;
+	this->v[1] = vy;
+	this->v[2] = vz;
 }

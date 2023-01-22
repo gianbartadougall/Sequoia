@@ -56,8 +56,10 @@ namespace vector3f {
 		float z();
 
 		float dot(Vector3f v);
-
-		static Vector3f cross(Vector3f v1, Vector3f v2);
+		float magnitude();
+		void normalise();
+		void rotate(float angle, Vector3f axis);
+		// static Vector3f cross(Vector3f v1, Vector3f v2);
 	};
 } // namespace vector3f
 

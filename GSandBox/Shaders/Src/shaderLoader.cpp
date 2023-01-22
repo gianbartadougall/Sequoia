@@ -57,8 +57,19 @@ void ShaderLoader::load_baseshader(string line, BaseShader* shader) {
 	// Get the location of the position variable
 	GLuint vertexLocation = glGetAttribLocation(shader->programId, "position");
 
-	// Specify to OpenGL how the data in the vbo of any object using this vertex
-	// shader will be and used to supply the 'position' variable with data
+	/** Specify to OpenGL how the data in the vbo of any object using this vertex shader will be and used to
+	 * supply the 'position' variable with data. Arguments:
+	 * 		1: The GLuint location of the position variable in the shader
+	 * 		2: Number of data points used to make up a single vertex (3 in this case i.e x, y, z)
+	 * 		3: The type of data (float in this case)
+	 * 		4: Whether the data is normalised. Don't actually know what this does, it was false in a tutorial
+	 * 		5: Stride length i.e How many data points each vertex in a mesh has that is loaded into a vbo. In
+	 * 			this case it is 6 as the meshes currently contain 3 vertex points and 3 colour values
+	 * 		6: The pointer to the first index to start reading from. As the vertex data is within the first
+	 * 			3 data values of information for each vertex, we keep this as 0 and OpenGL will read the first
+	 * 			3 data values and use that as the vertex (because we set number of data points to be 3 in arg
+	 * 			2)
+	 */
 	glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
 
 	// Inputs to a vertex shader are called vertex attributes. To enable a vertex attribute like
@@ -66,21 +77,39 @@ void ShaderLoader::load_baseshader(string line, BaseShader* shader) {
 	// anywhere as long as it is done before rendering)
 	glEnableVertexAttribArray(vertexLocation);
 
+	// Get the location of the colour variable
+	GLuint colourLocation = glGetAttribLocation(shader->programId, "colour");
+
+	/** Specify to OpenGL how the data in the vbo of any object using this vertex shader will be and used to
+	 * supply the 'colour' variable with data. Arguments:
+	 * 		1: The GLuint location of the colour variable in the shader
+	 * 		2: Number of data points used to make up a single colour (3 in this case i.e r, g, b)
+	 * 		3: The type of data (float in this case)
+	 * 		4: Whether the data is normalised. Don't actually know what this does, it was false in a tutorial
+	 * 		5: Stride length i.e How many data points each vertex in a mesh has that is loaded into a vbo. In
+	 * 			this case it is 6 as the meshes currently contain 3 vertex points and 3 colour values
+	 * 		6: The pointer to the first index to start reading from. As the colour data is within the last 3
+	 * 			data values of information for each vertex, we keep set this as 3 and OpenGL will skip the
+	 * 			first 3 data points (vertex points) and use the next 3 data points (colour values)
+	 */
+	glVertexAttribPointer(colourLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	// Inputs to a vertex shader are called vertex attributes. To enable a vertex attribute like
+	// the vec3 input 'colour', we must enable it by calling the following (This can be done
+	// anywhere as long as it is done before rendering)
+	glEnableVertexAttribArray(colourLocation);
+
 	// Get the location of generic uniforms
 	shader->transformationMatrixLocation = find_shader_variable_location(shader->programId, "transformationMatrix");
 	shader->projectionMatrixLocation	 = find_shader_variable_location(shader->programId, "projectionMatrix");
-	shader->viewMatrixLocation			 = find_shader_variable_location(shader->programId, "viewMatrix");
+	// shader->viewMatrixLocation	 = find_shader_variable_location(shader->programId, "viewMatrix");
+	shader->cameraRotationLocation = find_shader_variable_location(shader->programId, "cameraRotation");
+	shader->cameraPositionLocation = find_shader_variable_location(shader->programId, "cameraPosition");
 
 	// Load the projection matrix immediatley into each shader
 	Matrix4f projectionMatrix;
 	projectionMatrix.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 10);
 	glUniformMatrix4fv(shader->projectionMatrixLocation, 1, GL_FALSE, projectionMatrix.m);
-
-	// To make OpenGL take in the colour data we need to do the following
-	// colAttrib = glGetAttribLocation(shaderProgramId, "colour");
-	// std::cout << "Col attrib: " << colAttrib << std::endl;
-	// glEnableVertexAttribArray(colAttrib);
-	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	// Print out all these errors that occurred
 	GLenum err;
@@ -174,7 +203,7 @@ GLuint ShaderLoader::find_shader_variable_location(GLuint shaderId, string varia
 
 	if (locationId < 0) {
 		log.log_error("Failed to load shader attribute");
-		cout << variableName << endl;
+		cout << variableName << " has error: " << locationId << endl;
 	}
 
 	return locationId;

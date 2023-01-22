@@ -20,6 +20,9 @@
 
 /* Private Includes */
 #include "object.h"
+#include "vector3f.h"
+#include "vector3i.h"
+#include "algorithms.h"
 
 /* Private Macros */
 #define VERTEX_DATA(line)	 (line[0] == 'v' && line[1] == ' ')
@@ -29,6 +32,9 @@
 /* Private Enumerations and Structures */
 
 using namespace object;
+using namespace vector3f;
+using namespace vector3i;
+using namespace algorithms;
 
 Object::Object() {}
 
@@ -99,15 +105,27 @@ void Object::load_mesh(string filePath, Entity* entity) {
 
 	/****** END CODE BLOCK ******/
 
+	Vector3f* vertices;
+	Vector3i* vertexConnectionList;
+	vertices			 = new Vector3f[numVertices];
+	vertexConnectionList = new Vector3i[numFaces];
+	int vi				 = 0;
+	int vcli			 = 0;
+
 	// Store data into the arrays that were just created
 	while (getline(objFile, line)) {
 
 		if (VERTEX_DATA(line)) {
-			string vertices[3];
-			strUtils.split_string(line, vertices, 2, ' ');
-			vertexData[vdi++] = stof(vertices[0]);
-			vertexData[vdi++] = stof(vertices[1]);
-			vertexData[vdi++] = stof(vertices[2]);
+			string vertex[3];
+			strUtils.split_string(line, vertex, 2, ' ');
+			vertexData[vdi++] = stof(vertex[0]);
+			vertexData[vdi++] = stof(vertex[1]);
+			vertexData[vdi++] = stof(vertex[2]);
+
+			// Test code here
+			vertices[vi].set(stof(vertex[0]), stof(vertex[1]), stof(vertex[2]));
+			vi++;
+			// Test code here
 
 			// Adding a default colour to the objects for the moment
 			vertexData[vdi++] = 0.5;
@@ -117,18 +135,35 @@ void Object::load_mesh(string filePath, Entity* entity) {
 
 		if (FACE_DATA(line)) {
 
-			string faces[3];
-			strUtils.split_string(line, faces, 2, ' ');
+			string edges[3];
+			strUtils.split_string(line, edges, 2, ' ');
 
 			// Loop through each split to extract the element data
 			for (int i = 0; i < 3; i++) {
 
 				string faceData[3];
-				strUtils.split_string(faces[i], faceData, 0, '/');
+				strUtils.split_string(edges[i], faceData, 0, '/');
 				elementData[edi++] = stoi(faceData[0]) - 1;
+
+				// test code
+				if (i == 0) {
+					vertexConnectionList[vcli].set_x(stoi(faceData[0]) - 1);
+				} else if (i == 1) {
+					vertexConnectionList[vcli].set_y(stoi(faceData[0]) - 1);
+				} else {
+					vertexConnectionList[vcli].set_z(stoi(faceData[0]) - 1);
+				}
+				// test code
 			}
+
+			// test code
+			vcli++;
+			// test code
 		}
 	}
+
+	// Compute the volume
+	// float volume = Algorithms::compute_volume(vertices, vertexConnectionList, numFaces);
 
 	// Bind the vbo for this mesh to make them active
 	glBindBuffer(GL_ARRAY_BUFFER, entity->vbo);

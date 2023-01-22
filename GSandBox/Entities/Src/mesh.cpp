@@ -20,6 +20,9 @@
 /* Private Includes */
 #include "mesh.h"
 #include "array.h"
+#include "vector3f.h"
+#include "vector3i.h"
+#include "algorithms.h"
 
 /* Private Macros */
 #define VERTEX_DATA(line)	 (line[0] == 'v' && line[1] == ' ')
@@ -30,6 +33,7 @@
 
 using namespace mesh;
 using namespace vector3f;
+using namespace vector3i;
 
 Mesh::Mesh(GLuint vboId, GLuint eboId) {
 	vbo = vboId;
@@ -83,15 +87,27 @@ void Mesh::load_mesh(string objectFilePath, Vector3f colour) {
 
 	/****** END CODE BLOCK ******/
 
+	Vector3f* vertices;
+	Vector3i* vertexConnectionList;
+	vertices			 = new Vector3f[numVertices];
+	vertexConnectionList = new Vector3i[numFaces];
+	int vi				 = 0;
+	int vcli			 = 0;
+
 	// Store data into the arrays that were just created
 	while (getline(objFile, line)) {
 
 		if (VERTEX_DATA(line)) {
-			string vertices[3];
-			split_triplet(line, vertices, 2, ' ');
-			vertexData[vdi++] = stof(vertices[0]);
-			vertexData[vdi++] = stof(vertices[1]);
-			vertexData[vdi++] = stof(vertices[2]);
+			string vertex[3];
+			split_triplet(line, vertex, 2, ' ');
+			vertexData[vdi++] = stof(vertex[0]);
+			vertexData[vdi++] = stof(vertex[1]);
+			vertexData[vdi++] = stof(vertex[2]);
+
+			// Test code here
+			vertices[vi].set(stof(vertex[0]), stof(vertex[1]), stof(vertex[2]));
+			vi++;
+			// Test code here
 
 			// Adding a default colour to the objects for the moment
 			vertexData[vdi++] = colour.v[0];
@@ -101,16 +117,31 @@ void Mesh::load_mesh(string objectFilePath, Vector3f colour) {
 
 		if (FACE_DATA(line)) {
 
-			string faces[3];
-			split_triplet(line, faces, 2, ' ');
+			// Split face data into each edge connection
+			string edges[3];
+			split_triplet(line, edges, 2, ' ');
 
 			// Loop through each split to extract the element data
 			for (int i = 0; i < 3; i++) {
 
 				string faceData[3];
-				split_triplet(faces[i], faceData, 0, '/');
+				split_triplet(edges[i], faceData, 0, '/');
 				elementData[edi++] = stoi(faceData[0]) - 1;
+
+				// test code
+				if (i == 0) {
+					vertexConnectionList[vcli].set_x(stoi(faceData[0]) - 1);
+				} else if (i == 1) {
+					vertexConnectionList[vcli].set_y(stoi(faceData[0]) - 1);
+				} else {
+					vertexConnectionList[vcli].set_z(stoi(faceData[0]) - 1);
+				}
+				// test code
 			}
+
+			// test code
+			vcli++;
+			// test code
 		}
 	}
 
@@ -126,7 +157,8 @@ void Mesh::load_mesh(string objectFilePath, Vector3f colour) {
 	 * @param2: The number of components per vertex. Using 3D graphics => each vertex has x,y,z components
 	 * @param3: The data type of each component in the vbo
 	 * @param4: Whether the data should be normalised or not -> NOT ACTUALLY SURE WHAT THIS MEANS
-	 * @param5: The number of data points associated to each vertex. Each vertex has an x,y,z location and a r,g,b colour
+	 * @param5: The number of data points associated to each vertex. Each vertex has an x,y,z location and a r,g,b
+	 * colour
 	 * @param6: The offset of when to start reading the data from the vbo
 	 */
 	// glVertexAttribPointer(this->vao, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GL_FLOAT), 0);

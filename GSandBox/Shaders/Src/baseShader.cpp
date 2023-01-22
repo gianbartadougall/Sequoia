@@ -34,4 +34,5 @@ void BaseShader::print() {
 	cout << "View Matrix id: " << this->viewMatrixLocation << endl;
 	cout << "Projection Matrix id: " << this->projectionMatrixLocation << endl;
 	cout << "Transformation Matrix id: " << this->transformationMatrixLocation << endl;
+	cout << "Camera Location id: " << this->cameraRotationLocation << endl;
 }

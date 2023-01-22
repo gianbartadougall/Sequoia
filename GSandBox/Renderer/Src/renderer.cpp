@@ -58,9 +58,9 @@ void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* o
 		them by the cameras position first before rotating otherwise if you rotate
 		first then translate they will rotate about the origin instead of about the
 		cameras position */
-	matrix4f::Matrix4f vMat;
-	vMat.translate(camera->position);
-	vMat.rotate(camera->rotation);
+	// matrix4f::Matrix4f vMat;
+	// vMat.translate(camera->position);
+	// vMat.rotate(camera->rotation);
 
 	// Loop through every vao and render the all the objects associated with
 	// that vao
@@ -71,7 +71,11 @@ void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* o
 		// the function to draw the objects are called
 		glBindVertexArray(vaos[vi]);
 
-		glUniformMatrix4fv(objects[offset].shader->viewMatrixLocation, 1, GL_FALSE, vMat.m);
+		glUniform3f(objects[offset].shader->cameraRotationLocation, camera->rotation.v[0], camera->rotation.v[1],
+					camera->rotation.v[2]);
+		glUniform3f(objects[offset].shader->cameraPositionLocation, camera->position.v[0], camera->position.v[1],
+					camera->position.v[2]);
+		// glUniformMatrix4fv(objects[offset].shader->viewMatrixLocation, 1, GL_FALSE, vMat.m);
 
 		// Draw every object that is associated to the currently bound vao
 		for (int j = 0; j < objectListSizes[vi]; j++) {
@@ -85,10 +89,14 @@ void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* o
 				// Load the new shader
 				glUseProgram(this->currentShaderId);
 
-				vMat.set_to_identity();
-				vMat.translate(camera->position);
-				vMat.rotate(camera->rotation);
-				glUniformMatrix4fv(objects[k].shader->viewMatrixLocation, 1, GL_FALSE, vMat.m);
+				glUniform3f(objects[k].shader->cameraRotationLocation, camera->rotation.v[0], camera->rotation.v[1],
+							camera->rotation.v[2]);
+				glUniform3f(objects[k].shader->cameraPositionLocation, camera->position.v[0], camera->position.v[1],
+							camera->position.v[2]);
+				// vMat.set_to_identity();
+				// vMat.translate(camera->position);
+				// vMat.rotate(camera->rotation);
+				// glUniformMatrix4fv(objects[k].shader->viewMatrixLocation, 1, GL_FALSE, vMat.m);
 			}
 
 			// Update the shaders with the values of the current object to be rendered
