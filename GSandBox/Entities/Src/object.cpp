@@ -23,6 +23,7 @@
 #include "vector3f.h"
 #include "vector3i.h"
 #include "algorithms.h"
+#include "boundingBox.h"
 
 /* Private Macros */
 #define VERTEX_DATA(line)	 (line[0] == 'v' && line[1] == ' ')
@@ -35,6 +36,7 @@ using namespace object;
 using namespace vector3f;
 using namespace vector3i;
 using namespace algorithms;
+using namespace boundingBox;
 
 Object::Object() {}
 
@@ -112,18 +114,32 @@ void Object::load_mesh(string filePath, Entity* entity) {
 	int vi				 = 0;
 	int vcli			 = 0;
 
+	// Values for calculating bounding box. Setting values to reasonable min and max values
+	// For super large objects, these may need to be adjust
+	float minX = 1000000;
+	float minY = 1000000;
+	float minZ = 1000000;
+	float maxX = -1000000;
+	float maxY = -1000000;
+	float maxZ = -1000000;
+
 	// Store data into the arrays that were just created
 	while (getline(objFile, line)) {
 
 		if (VERTEX_DATA(line)) {
 			string vertex[3];
 			strUtils.split_string(line, vertex, 2, ' ');
-			vertexData[vdi++] = stof(vertex[0]);
-			vertexData[vdi++] = stof(vertex[1]);
-			vertexData[vdi++] = stof(vertex[2]);
+
+			float vx = stof(vertex[0]);
+			float vy = stof(vertex[1]);
+			float vz = stof(vertex[2]);
+
+			vertexData[vdi++] = vx;
+			vertexData[vdi++] = vy;
+			vertexData[vdi++] = vz;
 
 			// Test code here
-			vertices[vi].set(stof(vertex[0]), stof(vertex[1]), stof(vertex[2]));
+			vertices[vi].set(vx, vy, vz);
 			vi++;
 			// Test code here
 
@@ -131,6 +147,29 @@ void Object::load_mesh(string filePath, Entity* entity) {
 			vertexData[vdi++] = 0.5;
 			vertexData[vdi++] = 0.5;
 			vertexData[vdi++] = 0.5;
+
+			// CODE FOR CALCULATING THE BOUNDING BOX
+			if (vx < minX) {
+				minX = vx;
+			}
+			if (vy < minY) {
+				minY = vy;
+			}
+			if (vz < minZ) {
+				minZ = vz;
+			}
+
+			if (vx > maxX) {
+				maxX = vx;
+			}
+			if (vy > maxY) {
+				maxY = vy;
+			}
+			if (vz > maxZ) {
+				maxZ = vz;
+			}
+
+			// CODE FOR CALCULATING THE BOUNDING BOX
 		}
 
 		if (FACE_DATA(line)) {
@@ -163,7 +202,29 @@ void Object::load_mesh(string filePath, Entity* entity) {
 	}
 
 	// Compute the volume
-	// float volume = Algorithms::compute_volume(vertices, vertexConnectionList, numFaces);
+	entity->volume = Algorithms::compute_volume(vertices, vertexConnectionList, numFaces);
+	cout << minX << " " << minX << " " << minY << " " << minZ << " " << maxX << " " << maxY << " " << maxZ << " "
+		 << endl;
+	entity->boundingBox.set(minX, minY, minZ, maxX, maxY, maxZ);
+
+	// entity->boundingBox[0].set(minX, minY, minZ);
+	// entity->boundingBox[1].set(minX, minY, maxZ);
+	// entity->boundingBox[2].set(minX, maxY, minZ);
+	// entity->boundingBox[3].set(minX, maxY, maxZ);
+	// entity->boundingBox[4].set(maxX, minY, minZ);
+	// entity->boundingBox[5].set(maxX, minY, maxZ);
+	// entity->boundingBox[6].set(maxX, maxY, minZ);
+	// entity->boundingBox[7].set(maxX, maxY, maxZ);
+
+	// Creating the faces of the bounding boxes. Each vector contains
+	// three indexes which correspond to vertecies in the bounding
+	// box array
+	// entity->boundingBoxFaces[0].set(0, 4, 2); // Face 0
+	// entity->boundingBoxFaces[0].set(4, 7, 6); // Face 1
+	// entity->boundingBoxFaces[0].set(7, 3, 5); // Face 2
+	// entity->boundingBoxFaces[0].set(3, 0, 2); // Face 3
+	// entity->boundingBoxFaces[0].set(0, 4, 5); // Face 4
+	// entity->boundingBoxFaces[0].set(2, 6, 7); // Face 5
 
 	// Bind the vbo for this mesh to make them active
 	glBindBuffer(GL_ARRAY_BUFFER, entity->vbo);

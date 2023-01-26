@@ -33,6 +33,8 @@ namespace camera {
 		void translate(Vector3f translation);
 		void rotate(Vector3f rotation);
 
+		Vector3f acceleration;
+
 		Vector3f iUnitVector;
 		Vector3f jUnitVector;
 		Vector3f kUnitVector;

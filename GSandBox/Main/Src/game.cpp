@@ -37,6 +37,7 @@
 #include "gameSettings.h"
 #include "baseShader.h"
 #include "mathUtils.h"
+#include "boundingBox.h"
 
 using namespace game;
 using namespace std::chrono;
@@ -44,6 +45,7 @@ using namespace debugLog;
 using namespace objectLoader;
 using namespace object;
 using namespace baseShader;
+using namespace boundingBox;
 
 /* Private Marcos */
 #define OBJECT(line) (line[0] == 'O')
@@ -103,14 +105,27 @@ void Game::run() {
 	// Load everything in the game (only consists of objects at the moment)
 	load_game(TEST_GAME);
 
+	int minLength = 1000000; // Theoretical minimum length. Arbitrary I just set it to a large number
+
+	// Compute game stats
 	for (int i = 0; i < numEntities; i++) {
-		objects[i].print();
+		if (this->objects[i].boundingBox.length() < minLength) {
+			minLength = this->objects[i].boundingBox.length();
+		}
 	}
+
+	float minSectorSize = 8 * minLength * minLength * minLength;
+	cout << "Smallest volume: " << minSectorSize << endl;
 
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 
 		detect_keys();
+
+		/* Update entities */
+		for (int i = 0; i < numEntities; i++) {
+			objects[i].update();
+		}
 
 		/* Render here */
 		renderer.render(this->vaos, numVaos, &camera, objects, objectListSizes);
@@ -130,13 +145,6 @@ void Game::run() {
 			time1  = system_clock::now();
 		}
 
-		/****** START CODE BLOCK ******/
-		// Description: Manipulate the orientation, position and scale of the objects in the scene
-		for (int i = 0; i < this->numEntities; i++) {
-			// objects[i].rotation.add(0.000, 0.0001, 0.000);
-		}
-
-		/****** END CODE BLOCK ******/
 		frames++;
 	}
 

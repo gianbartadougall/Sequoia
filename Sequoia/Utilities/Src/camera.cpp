@@ -34,7 +34,7 @@ Camera::Camera() {
 	jUnitVector.set(0, 1, 0);
 	kUnitVector.set(0, 0, 1);
 	jUnitVectorNeg.set(0, -1, 0);
-	rotation.set(0, PI_DIV_2, 0);
+	rotation.set(0, 0, 0);
 	position.set(0, 0, 0);
 }
 
@@ -54,26 +54,22 @@ void Camera::move_left() {
 
 	this->position.add_z(CAMERA_TRANSLATION_SPEED * cos(this->rotation.v[1] - PI_DIV_2));
 	this->position.add_x(CAMERA_TRANSLATION_SPEED * sin(this->rotation.v[1] - PI_DIV_2));
-	// position.print();
 }
 
 void Camera::move_right() {
 
 	this->position.add_z(CAMERA_TRANSLATION_SPEED * cos(this->rotation.v[1] + PI_DIV_2));
 	this->position.add_x(CAMERA_TRANSLATION_SPEED * sin(this->rotation.v[1] + PI_DIV_2));
-	// position.print();
 }
 
 void Camera::move_forward() {
 	this->position.add_x(-CAMERA_TRANSLATION_SPEED * sin(this->rotation.v[1]));
 	this->position.add_z(-CAMERA_TRANSLATION_SPEED * cos(this->rotation.v[1]));
-	// position.print();
 }
 
 void Camera::move_backward() {
 	this->position.add_x(CAMERA_TRANSLATION_SPEED * sin(this->rotation.v[1]));
 	this->position.add_z(CAMERA_TRANSLATION_SPEED * cos(this->rotation.v[1]));
-	// position.print();
 }
 
 void Camera::rotate_left() {

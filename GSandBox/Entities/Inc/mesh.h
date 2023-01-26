@@ -38,13 +38,13 @@ namespace mesh {
 		// Private variables
 		debugLog::DebugLog log;
 
-
 		public:
 		GLuint vao; // Vertex array object
 		GLuint vbo; // Vertex buffer object
 		GLuint ebo; // Element buffer object
 		int eboSize;
-		
+
+		float boundingBox[8];		
 		float volume;
 		
 		Mesh(GLuint vboId, GLuint eboId);

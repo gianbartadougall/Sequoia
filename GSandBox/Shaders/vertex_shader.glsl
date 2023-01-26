@@ -37,6 +37,5 @@ void main() {
 
     // Assign the position and the colour
     gl_Position = projectionMatrix * vec4(pos, 1.0);
-    Colour = colour; 
-    //vertex.xyz;
+    Colour = colour;
 }

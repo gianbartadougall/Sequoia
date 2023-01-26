@@ -35,7 +35,7 @@ void Renderer::load_generic_shader_values(Entity* entity) {
 	Matrix4f transformationMatrix;
 	transformationMatrix.scale(entity->scale);
 	transformationMatrix.rotate(entity->rotation);
-	transformationMatrix.translate(entity->position);
+	transformationMatrix.translate(entity->get_position());
 	glUniformMatrix4fv(entity->shader->transformationMatrixLocation, 1, GL_FALSE, transformationMatrix.m);
 }
 
@@ -104,8 +104,8 @@ void Renderer::render_objects(GLuint* vaos, int numVaos, Object* objects, int* o
 
 			// Draw the object. The last argument specifiies where OpenGL should
 			// start reading the vertecies from in the vbo
-			// glBindBuffer(GL_ARRAY_BUFFER, objects[k].vbo);
-			// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[k].ebo);
+			glBindBuffer(GL_ARRAY_BUFFER, objects[k].vbo);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[k].ebo);
 			glDrawElements(GL_TRIANGLES, objects[k].eboSize, GL_UNSIGNED_INT, 0);
 		}
 

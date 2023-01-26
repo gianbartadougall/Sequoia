@@ -38,3 +38,9 @@ void Vector3i::set_y(int y) {
 void Vector3i::set_z(int z) {
 	this->v[2] = z;
 }
+
+void Vector3i::set(int x, int y, int z) {
+	this->v[0] = x;
+	this->v[1] = y;
+	this->v[2] = z;
+}

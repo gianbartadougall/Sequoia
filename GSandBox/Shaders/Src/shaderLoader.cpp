@@ -108,7 +108,7 @@ void ShaderLoader::load_baseshader(string line, BaseShader* shader) {
 
 	// Load the projection matrix immediatley into each shader
 	Matrix4f projectionMatrix;
-	projectionMatrix.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 10);
+	projectionMatrix.projection_matrix(WINDOW_WIDTH, WINDOW_HEIGHT, 0.1, 1000);
 	glUniformMatrix4fv(shader->projectionMatrixLocation, 1, GL_FALSE, projectionMatrix.m);
 
 	// Print out all these errors that occurred
