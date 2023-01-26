@@ -35,8 +35,8 @@ namespace strUtils {
 		StrUtils();
 		~StrUtils();
 
-		void split_string(string line, string* splitData, int start, char delimiter);
+		static void split_string(string line, string* splitData, int start, char delimiter);
 	};
-}
+} // namespace strUtils
 
 #endif // STR_UTILS_H

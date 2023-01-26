@@ -12,7 +12,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-/* Public Includes */
+/* C Library Includes */
+#include <string>
 
 /* GLEW Includes */
 
@@ -24,6 +25,7 @@
 /* Public Enumerations and Structures */
 
 using namespace vector3f;
+using namespace std;
 
 namespace camera {
 
@@ -51,6 +53,8 @@ namespace camera {
 		void move_right();
 		void move_forward();
 		void move_backward();
+
+		void load_state(string line);
 
 		void rotate_left();
 		void rotate_right();

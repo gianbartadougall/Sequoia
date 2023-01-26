@@ -13,5 +13,5 @@ void main() {
     // Assign the position and the colour
     Colour = 0.5 * (position + vec3(1, 1, 1));
 
-    gl_Position = projectionMatrix * viewMatrix * transformationMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * transformationMatrix * vec4(position, 1.0);
 }

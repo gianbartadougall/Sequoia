@@ -35,6 +35,8 @@ namespace baseShader {
 
 		// Shader id
 		GLuint programId;
+		GLuint vertexShaderId;
+		GLuint fragmentShaderId;
 
 		/* Location ids for attributes within the vertex shaders */
 		GLuint vertexLocation;
@@ -43,6 +45,7 @@ namespace baseShader {
 		GLuint viewMatrixLocation;
 		GLuint cameraRotationLocation;
 		GLuint cameraPositionLocation;
+		GLuint colourLocation;
 
 		void print();
 	};

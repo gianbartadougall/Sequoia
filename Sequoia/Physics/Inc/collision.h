@@ -18,12 +18,14 @@
 
 /* Personal Includes */
 #include "entity.h"
+#include "object.h"
 
 /* Public Macros */
 
 /* Public Enumerations and Structures */
 
 using namespace entity;
+using namespace object;
 
 namespace collision {
 
@@ -35,7 +37,9 @@ namespace collision {
 		Collision();
 		~Collision();
 
-		void rigid_body_collision(Entity* e1, Entity* e2);
+		static void rigid_body_collision(Object** entites, int numEntities);
+
+		static bool rigid_body_vertical_collision(Entity* e1, Entity* e2);
 	};
 } // namespace collision
 

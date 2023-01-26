@@ -10,15 +10,16 @@
  *
  */
 
-/* Public Includes */
+/* C Library Includes */
 #include <math.h>
 #include <stdio.h>
 
 /* GLEW Includes */
 
-/* Private Includes */
+/* Personal Includes */
 #include "camera.h"
 #include "mathUtils.h"
+#include "strUtils.h"
 
 /* Private Macros */
 #define CAMERA_TRANSLATION_SPEED 0.0005
@@ -28,6 +29,7 @@
 
 using namespace camera;
 using namespace mathUtils;
+using namespace strUtils;
 
 Camera::Camera() {
 	iUnitVector.set(1, 0, 0);
@@ -79,8 +81,6 @@ void Camera::rotate_left() {
 	if ((this->rotation).v[1] > (PI_MULT_2)) {
 		this->rotation.set_y(0);
 	}
-	// this->rotation.print();
-	// printf("Theta: %f\r\n", RAD_TO_DEG(this->rotation.v[1]));
 }
 
 void Camera::rotate_right() {
@@ -90,29 +90,31 @@ void Camera::rotate_right() {
 	if ((this->rotation).v[1] < 0) {
 		this->rotation.set_y(PI_MULT_2);
 	}
-
-	// this->rotation.print();
-	// printf("Theta: %f\r\n", RAD_TO_DEG(this->rotation.v[1]));
 }
 
-/* I don't understand why you need to change the sign of the camera rotation
-	in the vertical position based on the z-axis but you do if you want the
-	camera rotation to work correctly when the camera moves around z = 0*/
 void Camera::rotate_up() {
 
 	if ((this->rotation).v[0] < PI_DIV_2) {
 		this->rotation.add_x(CAMERA_ROTATION_SPEED);
-		// this->rotation.print();
 	}
 }
 
-/* I don't understand why you need to change the sign of the camera rotation
-	in the vertical position based on the z-axis but you do if you want the
-	camera rotation to work correctly when the camera moves around z = 0*/
 void Camera::rotate_down() {
 
 	if ((this->rotation).v[0] > -PI_DIV_2) {
 		this->rotation.add_x(-CAMERA_ROTATION_SPEED);
-		// this->rotation.print();
 	}
+}
+
+void Camera::load_state(string line) {
+
+	string data[6];
+	StrUtils::split_string(line, data, 0, ',');
+
+	this->position.set_x(stof(data[1]));
+	this->position.set_y(stof(data[2]));
+	this->position.set_z(stof(data[3]));
+
+	this->rotation.set_x(stof(data[4]));
+	this->rotation.set_y(stof(data[5]));
 }

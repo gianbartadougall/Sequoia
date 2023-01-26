@@ -39,8 +39,6 @@ namespace shaderLoader {
 		// Private variables
 		GLchar* compiledShader;
 
-		debugLog::DebugLog log;
-
 		public:
 		GLuint vertexShaderId;
 		GLuint fragmentShaderId;

@@ -52,6 +52,7 @@ namespace renderer {
 		~Renderer();
 
 		void render(GLuint* vaos, int numVaos, Camera* camera, Object* objects, int* objectListSizes);
+		void render_objects1(Camera* camera, Object* objects, int numObjects);
 	};
 
 } // namespace renderer

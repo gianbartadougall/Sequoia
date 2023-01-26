@@ -106,3 +106,12 @@ int BoundingBox::collision(BoundingBox* box) {
 
 	return true;
 }
+
+int BoundingBox::collision_min_y(BoundingBox* box) {
+
+	if (this->minY > box->maxY) {
+		return false;
+	}
+
+	return true;
+}

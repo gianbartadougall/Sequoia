@@ -1,7 +1,7 @@
 /**
- * @file log.cpp
+ * @file DebugLog.cpp
  * @author Gian Barta-Dougall
- * @brief System file for log
+ * @brief System file for DebugLog
  * @version 0.1
  * @date --
  *

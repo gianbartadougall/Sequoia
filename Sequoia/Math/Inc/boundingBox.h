@@ -41,7 +41,10 @@ namespace boundingBox {
 		~BoundingBox();
 
 		void set(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+		
 		int collision(BoundingBox* box);
+		int collision_min_y(BoundingBox* box);
+
 		float volume();
 		float length();
 	};

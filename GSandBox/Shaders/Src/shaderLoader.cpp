@@ -48,63 +48,69 @@ void ShaderLoader::load_baseshader(string line, BaseShader* shader) {
 	utils.split_string(line, shaders, 2, ',');
 
 	// Compile the vertex and fragment shader and then link the shaders together
-	GLuint vertexShaderId	= compile_shader(shaders[0], GL_VERTEX_SHADER);
-	GLuint fragmentShaderId = compile_shader(shaders[1], GL_FRAGMENT_SHADER);
-	shader->programId		= link_shaders(vertexShaderId, fragmentShaderId);
+	shader->vertexShaderId	 = compile_shader(shaders[0], GL_VERTEX_SHADER);
+	shader->fragmentShaderId = compile_shader(shaders[1], GL_FRAGMENT_SHADER);
+	shader->programId		 = link_shaders(shader->vertexShaderId, shader->fragmentShaderId);
 
 	glUseProgram(shader->programId);
 
-	// Get the location of the position variable
-	GLuint vertexLocation = glGetAttribLocation(shader->programId, "position");
+	// // Get the location of the position variable
+	// GLuint vertexLocation = glGetAttribLocation(shader->programId, "position");
 
-	/** Specify to OpenGL how the data in the vbo of any object using this vertex shader will be and used to
-	 * supply the 'position' variable with data. Arguments:
-	 * 		1: The GLuint location of the position variable in the shader
-	 * 		2: Number of data points used to make up a single vertex (3 in this case i.e x, y, z)
-	 * 		3: The type of data (float in this case)
-	 * 		4: Whether the data is normalised. Don't actually know what this does, it was false in a tutorial
-	 * 		5: Stride length i.e How many data points each vertex in a mesh has that is loaded into a vbo. In
-	 * 			this case it is 6 as the meshes currently contain 3 vertex points and 3 colour values
-	 * 		6: The pointer to the first index to start reading from. As the vertex data is within the first
-	 * 			3 data values of information for each vertex, we keep this as 0 and OpenGL will read the first
-	 * 			3 data values and use that as the vertex (because we set number of data points to be 3 in arg
-	 * 			2)
-	 */
-	glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	// /** Specify to OpenGL how the data in the vbo of any object using this vertex shader will be and used to
+	//  * supply the 'position' variable with data. Arguments:
+	//  * 		1: The GLuint location of the position variable in the shader
+	//  * 		2: Number of data points used to make up a single vertex (3 in this case i.e x, y, z)
+	//  * 		3: The type of data (float in this case)
+	//  * 		4: Whether the data is normalised. Don't actually know what this does, it was false in a tutorial
+	//  * 		5: Stride length i.e How many data points each vertex in a mesh has that is loaded into a vbo. In
+	//  * 			this case it is 6 as the meshes currently contain 3 vertex points and 3 colour values
+	//  * 		6: The pointer to the first index to start reading from. As the vertex data is within the first
+	//  * 			3 data values of information for each vertex, we keep this as 0 and OpenGL will read the first
+	//  * 			3 data values and use that as the vertex (because we set number of data points to be 3 in arg
+	//  * 			2)
+	//  */
+	// glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
 
-	// Inputs to a vertex shader are called vertex attributes. To enable a vertex attribute like
-	// the vec3 input 'position', we must enable it by calling the following (This can be done
-	// anywhere as long as it is done before rendering)
-	glEnableVertexAttribArray(vertexLocation);
+	// // Inputs to a vertex shader are called vertex attributes. To enable a vertex attribute like
+	// // the vec3 input 'position', we must enable it by calling the following (This can be done
+	// // anywhere as long as it is done before rendering)
+	// glEnableVertexAttribArray(vertexLocation);
 
-	// Get the location of the colour variable
-	GLuint colourLocation = glGetAttribLocation(shader->programId, "colour");
+	// // Get the location of the colour variable
+	// GLuint colourLocation = glGetAttribLocation(shader->programId, "colour");
 
-	/** Specify to OpenGL how the data in the vbo of any object using this vertex shader will be and used to
-	 * supply the 'colour' variable with data. Arguments:
-	 * 		1: The GLuint location of the colour variable in the shader
-	 * 		2: Number of data points used to make up a single colour (3 in this case i.e r, g, b)
-	 * 		3: The type of data (float in this case)
-	 * 		4: Whether the data is normalised. Don't actually know what this does, it was false in a tutorial
-	 * 		5: Stride length i.e How many data points each vertex in a mesh has that is loaded into a vbo. In
-	 * 			this case it is 6 as the meshes currently contain 3 vertex points and 3 colour values
-	 * 		6: The pointer to the first index to start reading from. As the colour data is within the last 3
-	 * 			data values of information for each vertex, we keep set this as 3 and OpenGL will skip the
-	 * 			first 3 data points (vertex points) and use the next 3 data points (colour values)
-	 */
-	glVertexAttribPointer(colourLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	// /** Specify to OpenGL how the data in the vbo of any object using this vertex shader will be and used to
+	//  * supply the 'colour' variable with data. Arguments:
+	//  * 		1: The GLuint location of the colour variable in the shader
+	//  * 		2: Number of data points used to make up a single colour (3 in this case i.e r, g, b)
+	//  * 		3: The type of data (float in this case)
+	//  * 		4: Whether the data is normalised. Don't actually know what this does, it was false in a tutorial
+	//  * 		5: Stride length i.e How many data points each vertex in a mesh has that is loaded into a vbo. In
+	//  * 			this case it is 6 as the meshes currently contain 3 vertex points and 3 colour values
+	//  * 		6: The pointer to the first index to start reading from. As the colour data is within the last 3
+	//  * 			data values of information for each vertex, we keep set this as 3 and OpenGL will skip the
+	//  * 			first 3 data points (vertex points) and use the next 3 data points (colour values)
+	//  */
+	// glVertexAttribPointer(colourLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
-	// Inputs to a vertex shader are called vertex attributes. To enable a vertex attribute like
-	// the vec3 input 'colour', we must enable it by calling the following (This can be done
-	// anywhere as long as it is done before rendering)
-	glEnableVertexAttribArray(colourLocation);
+	// // Inputs to a vertex shader are called vertex attributes. To enable a vertex attribute like
+	// // the vec3 input 'colour', we must enable it by calling the following (This can be done
+	// // anywhere as long as it is done before rendering)
+	// glEnableVertexAttribArray(colourLocation);
+
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		DebugLog::log_error("Shader Error occured 2");
+		cout << "Code: " << err << endl;
+		// Process/log the error.
+	}
 
 	// Get the location of generic uniforms
 	shader->transformationMatrixLocation = find_shader_variable_location(shader->programId, "transformationMatrix");
 	shader->projectionMatrixLocation	 = find_shader_variable_location(shader->programId, "projectionMatrix");
-	// shader->viewMatrixLocation	 = find_shader_variable_location(shader->programId, "viewMatrix");
-	shader->cameraRotationLocation = find_shader_variable_location(shader->programId, "cameraRotation");
-	shader->cameraPositionLocation = find_shader_variable_location(shader->programId, "cameraPosition");
+	shader->cameraRotationLocation		 = find_shader_variable_location(shader->programId, "cameraRotation");
+	shader->cameraPositionLocation		 = find_shader_variable_location(shader->programId, "cameraPosition");
 
 	// Load the projection matrix immediatley into each shader
 	Matrix4f projectionMatrix;
@@ -112,9 +118,9 @@ void ShaderLoader::load_baseshader(string line, BaseShader* shader) {
 	glUniformMatrix4fv(shader->projectionMatrixLocation, 1, GL_FALSE, projectionMatrix.m);
 
 	// Print out all these errors that occurred
-	GLenum err;
+	// GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
-		log.log_error("Shader Error occured");
+		DebugLog::log_error("Shader Error occured");
 		cout << "Code: " << err << endl;
 		// Process/log the error.
 	}
@@ -136,7 +142,7 @@ GLuint ShaderLoader::compile_shader(string shaderFilePath, int shaderType) {
 	int success;
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
 	if (success != GL_TRUE) {
-		log.log_error("Could not compile shader");
+		DebugLog::log_error("Could not compile shader");
 		cout << shaderFilePath << endl;
 	}
 
@@ -191,7 +197,7 @@ GLuint ShaderLoader::link_shaders(GLuint vertexShaderId, GLuint fragmentShaderId
 	int success;
 	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
 	if (success != GL_TRUE) {
-		log.log_error("Shader failed to link");
+		DebugLog::log_error("Shader failed to link");
 	}
 
 	return shaderProgramId;
@@ -202,7 +208,7 @@ GLuint ShaderLoader::find_shader_variable_location(GLuint shaderId, string varia
 	GLint locationId = glGetUniformLocation(shaderId, (GLchar*)variableName.c_str());
 
 	if (locationId < 0) {
-		log.log_error("Failed to load shader attribute");
+		DebugLog::log_error("Failed to load shader attribute");
 		cout << variableName << " has error: " << locationId << endl;
 	}
 

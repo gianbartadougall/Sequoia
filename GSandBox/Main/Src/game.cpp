@@ -27,7 +27,7 @@
 /* GLFW Includes */
 #include <GLFW/glfw3.h>
 
-/* Private Includes */
+/* Personal Includes */
 #include "game.h"
 #include "debugLog.h"
 #include "matrix4f.h"
@@ -38,6 +38,9 @@
 #include "baseShader.h"
 #include "mathUtils.h"
 #include "boundingBox.h"
+#include "physicsSettings.h"
+#include "collision.h"
+#include "objectLoader.h"
 
 using namespace game;
 using namespace std::chrono;
@@ -46,11 +49,15 @@ using namespace objectLoader;
 using namespace object;
 using namespace baseShader;
 using namespace boundingBox;
+using namespace collision;
 
 /* Private Marcos */
-#define OBJECT(line) (line[0] == 'O')
-#define SHADER(line) (line[0] == 'S')
-#define VAO(line)	 (line[0] == 'V')
+#define OBJECT(line)		  (line[0] == 'O')
+#define VAO(line)			  (line[0] == 'V')
+#define SHADER(line)		  (line[0] == 'S')
+#define ENTITY(line)		  (line[0] == 'E')
+#define CAMERA_SETTING(line)  (line[0] == 'C' && line[1] == 'S')
+#define GRAVITY_SETTING(line) (line[0] == 'G' && line[1] == 'S')
 
 /* Private variable Declarations */
 GLFWwindow* window;
@@ -93,6 +100,12 @@ Game::~Game() {
 	delete objects;
 	delete baseShaders;
 
+	for (int i = 0; i < this->numShaders; i++) {
+		glDeleteProgram(this->baseShaders[i].programId);
+		glDeleteShader(this->baseShaders[i].vertexShaderId);
+		glDeleteShader(this->baseShaders[i].fragmentShaderId);
+	}
+
 	// Free any resources that were used
 	glfwTerminate();
 }
@@ -105,17 +118,19 @@ void Game::run() {
 	// Load everything in the game (only consists of objects at the moment)
 	load_game(TEST_GAME);
 
-	int minLength = 1000000; // Theoretical minimum length. Arbitrary I just set it to a large number
+	// int minLength = 1000000; // Theoretical minimum length. Arbitrary I just set it to a large number
 
 	// Compute game stats
 	for (int i = 0; i < numEntities; i++) {
-		if (this->objects[i].boundingBox.length() < minLength) {
-			minLength = this->objects[i].boundingBox.length();
-		}
+		// if (this->objects[i].boundingBox.length() < minLength) {
+		// 	minLength = this->objects[i].boundingBox.length();
+		// }
+		cout << "Entity " << i << endl;
+		cout << "EBO Size " << objects[i].eboSize << endl;
 	}
 
-	float minSectorSize = 8 * minLength * minLength * minLength;
-	cout << "Smallest volume: " << minSectorSize << endl;
+	// float minSectorSize = 8 * minLength * minLength * minLength;
+	// cout << "Smallest volume: " << minSectorSize << endl;
 
 	// Run main game loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -123,12 +138,15 @@ void Game::run() {
 		detect_keys();
 
 		/* Update entities */
-		for (int i = 0; i < numEntities; i++) {
-			objects[i].update();
-		}
+		// for (int i = 0; i < numEntities; i++) {
+		// 	objects[i].update();
+		// }
+
+		// Collision::rigid_body_collision(&objects, numEntities);
 
 		/* Render here */
-		renderer.render(this->vaos, numVaos, &camera, objects, objectListSizes);
+		renderer.render_objects1(&camera, this->objects, this->numEntities);
+		// renderer.render(this->vaos, numVaos, &camera, objects, objectListSizes);
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -157,26 +175,20 @@ void Game::load_game(string filePath) {
 	std::ifstream gameFile(filePath);
 
 	if (gameFile.is_open() != true) {
-		log.log_error("Could not load game. The file could not be read");
+		DebugLog::log_error("Could not load game. The file could not be read");
 		cout << "Filepath: " << filePath << endl;
 		return;
 	}
 
-	// Calculate the number of entities in the game
-
 	string line;
 	while (getline(gameFile, line)) {
 
-		if (OBJECT(line)) {
+		if (ENTITY(line)) {
 			this->numEntities++;
 		}
 
 		if (SHADER(line)) {
 			this->numShaders++;
-		}
-
-		if (VAO(line)) {
-			this->numVaos++;
 		}
 	}
 
@@ -184,65 +196,170 @@ void Game::load_game(string filePath) {
 	gameFile.clear();
 	gameFile.seekg(0);
 
-	// Creat list of entity objects
-
-	this->objects		  = new Object[numEntities];
-	this->baseShaders	  = new BaseShader[numShaders];
-	this->vaos			  = new GLuint[numVaos];
-	this->objectListSizes = new int[numVaos];
-
-	for (int i = 0; i < numVaos; i++) {
-		this->objectListSizes[i] = 0;
-	}
-
+	this->objects	  = new Object[numEntities];
+	this->baseShaders = new BaseShader[numShaders];
 	string shaders[numShaders];
 
-	int objIndex = 0;
-	int si		 = 0;
-	int vi		 = 0;
+	int oi			   = 0;
+	int si			   = 0;
+	GLuint activeVao   = 0;
+	int currentEboSize = 0;
 
-	glGenVertexArrays(numVaos, this->vaos);
+	MeshBufferData currentMBD;
 
 	// Load in all the entities in the game
 	while (getline(gameFile, line)) {
 
-		if (VAO(line)) {
-			glBindVertexArray(this->vaos[vi]);
-			vi++;
-		}
-
-		if (SHADER(line)) {
-			shaders[si] = line;
-			si++;
-			continue;
-		}
-
 		if (OBJECT(line)) {
-			this->objectListSizes[vi - 1]++;
-			objects[objIndex].load(line);
-			objects[objIndex].loadShaderId = si;
-			objIndex++;
+			string data[3];
+			StrUtils::split_string(line, data, 0, ',');
+			int shaderIndex = atoi(data[1].c_str());
+			objectLoader.new_object(data[2], &baseShaders[shaderIndex], &currentMBD);
+			continue;
+		}
+
+		// The shader needs to be compiled after the VBO has been compiled otherwise it won't work!
+		// You will need to fix this up for everything else
+		if (SHADER(line)) {
+			shaderLoader.load_baseshader(line, &baseShaders[si]);
+			continue;
+		}
+
+		if (ENTITY(line)) {
+			objects[oi].init(&currentMBD, line);
+			objects[oi++].set_shader(&baseShaders[si]);
+			continue;
+		}
+
+		if (GRAVITY_SETTING(line)) {
+			phys.load_values(line);
+			continue;
+		}
+
+		if (CAMERA_SETTING(line)) {
+			this->camera.load_state(line);
 			continue;
 		}
 	}
-
-	// Load shaders. It is important that this is done after all the vbos and vaos have been generated
-	for (int i = 0; i < numShaders; i++) {
-		// Load the shader
-		shaderLoader.load_baseshader(shaders[i], &baseShaders[i]);
-
-		for (int j = 0; j < numEntities; j++) {
-			if (objects[j].loadShaderId == i) {
-				objects[j].load_shader(&baseShaders[i]);
-			}
-		}
-	}
-
-	gameFile.close();
-
-	// Unbind vao
-	glBindVertexArray(0);
 }
+
+// void Game::load_game1(string filePath) {
+
+// 	// Confirm given file path exists
+// 	std::ifstream gameFile(filePath);
+
+// 	if (gameFile.is_open() != true) {
+// 		DebugLog.log_error("Could not load game. The file could not be read");
+// 		cout << "Filepath: " << filePath << endl;
+// 		return;
+// 	}
+
+// 	// Calculate the number of entities in the game
+
+// 	string line;
+// 	while (getline(gameFile, line)) {
+
+// 		if (OBJECT(line)) {
+// 			this->numVbos++;
+// 		}
+
+// 		if (SHADER(line)) {
+// 			this->numShaders++;
+// 		}
+
+// 		if (VAO(line)) {
+// 			this->numVaos++;
+// 		}
+// 	}
+
+// 	// Go back to the start of the gameFile
+// 	gameFile.clear();
+// 	gameFile.seekg(0);
+
+// 	// Creat list of entity objects
+
+// 	this->objects		  = new Object[numEntities];
+// 	this->baseShaders	  = new BaseShader[numShaders];
+// 	this->vaos			  = new GLuint[numVaos];
+// 	this->vbos			  = new GLuint[numVbos];
+// 	this->ebos			  = new GLuint[numVbos];
+// 	this->objectListSizes = new int[numVaos];
+
+// 	// Set the number of
+// 	for (int i = 0; i < numVaos; i++) {
+// 		this->objectListSizes[i] = 0;
+// 	}
+
+// 	string shaders[numShaders];
+
+// 	int objIndex = 0;
+// 	int si		 = 0;
+// 	int vaoi	 = 0;
+// 	int vboi	 = 0;
+
+// 	glGenVertexArrays(numVaos, this->vaos);
+
+// 	// Load in all the entities in the game
+// 	while (getline(gameFile, line)) {
+
+// 		if (VAO(line)) {
+// 			glBindVertexArray(this->vaos[vaoi]);
+// 			vaoi++;
+// 			continue;
+// 		}
+
+// 		if (OBJECT(line)) {
+// 			ObjectLoader::load_mesh(this->vbos[vboi], this->vbos[vboi]);
+// 			vboi++;
+// 		}
+
+// 		if (SHADER(line)) {
+// 			shaders[si] = line;
+// 			si++;
+// 			continue;
+// 		}
+
+// 		if (ENTITY(line)) {
+// 			this->objectListSizes[vaoi - 1]++;
+// 			objects[objIndex].load(line);
+// 			objects[objIndex].loadShaderId = si;
+// 			objIndex++;
+// 			continue;
+// 		}
+
+// 		if (GRAVITY_SETTING(line)) {
+// 			phys.load_values(line);
+// 			continue;
+// 		}
+
+// 		if (CAMERA_SETTING(line)) {
+// 			this->camera.load_state(line);
+// 			continue;
+// 		}
+// 	}
+
+// 	// Load shaders. It is important that this is done after all the vbos and vaos have been generated
+// 	for (int i = 0; i < numShaders; i++) {
+// 		// Load the shader
+// 		shaderLoader.load_baseshader(shaders[i], &baseShaders[i]);
+
+// 		for (int j = 0; j < numEntities; j++) {
+// 			if (objects[j].loadShaderId == i) {
+// 				objects[j].load_shader(&baseShaders[i]);
+// 			}
+// 		}
+// 	}
+
+// 	gameFile.close();
+
+// 	// Load all the physics settings into each entity
+// 	for (int i = 0; i < numEntities; i++) {
+// 		objects[i].load_physics_settings(&phys);
+// 	}
+
+// 	// Unbind vao
+// 	glBindVertexArray(0);
+// }
 
 void Game::detect_mouse() {
 
@@ -279,6 +396,7 @@ void Game::detect_keys() {
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
+		exit(1);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {

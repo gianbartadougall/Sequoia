@@ -11,53 +11,52 @@
 #ifndef OBJECTLOADER_H
 #define OBJECTLOADER_H
 
-/* Public Includes */
+/* C Library Includes */
 #include <string.h>
 
 /* GLEW Includes */
 #define GLEW_STATIC
 #include <GL/glew.h>
 
-/* Private Includes */
+/* Personal Includes */
 #include "debugLog.h"
-#include "object.h"
+#include "baseShader.h"
 
 /* Public Macros */
-#define MAX_NUM_OBJECTS 1
+#define MAX_MESH_TYPES 3
+#define MAX_MESHES	   5
 
 /* Public Enumerations and Structures */
-typedef struct ObjectData {
-	GLuint elementBuffer;
-	int elementArraySize;
-} ObjectData;
+
+typedef struct MeshBufferData {
+	GLuint vao;
+	GLuint vbo;
+	GLuint ebo;
+	int eboSize;
+} MeshBufferData;
 
 using namespace debugLog;
-using namespace object;
+using namespace baseShader;
 
 namespace objectLoader {
 
 	class ObjectLoader {
 
 		// Private variables
-		debugLog::DebugLog log;
 
 		// Variable to store how many objects have been loaded
 		int objectIndex = 0;
 
-		// Array for vertex buffers and element buffers
-		GLuint vao;
-		GLuint* vba;
-		GLuint* eba;
+		struct MeshBufferData buffers[MAX_MESHES];
 
-		object::Object* objects;
-		int numObjects;
+		int numMeshes = 0;
 
 		public:
 		ObjectLoader();
 		~ObjectLoader();
-		Object* load_objects(string objectFileNames[], int numObjects);
-		void load_3D_object(string path, ObjectData* objects);
-		void split_triplet(string data, string* splitList, int start, char delimiter);
+
+		GLuint new_vao();
+		void new_object(string filePath, BaseShader* baseShader, MeshBufferData* mbd);
 	};
 } // namespace objectLoader
 

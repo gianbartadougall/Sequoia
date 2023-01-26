@@ -30,6 +30,22 @@
 #define FACE_DATA(line)		 (line[0] == 'f' && line[1] == ' ')
 #define REMOVE_COMMAND(line) (line[0] = 'f'; line[1] = ' ')
 
+#define SHADER_ID 1
+#define FILE_PATH 2
+#define POS_X	  3
+#define POS_Y	  4
+#define POS_Z	  5
+#define ROT_X	  6
+#define ROT_Y	  7
+#define ROT_Z	  8
+#define SCL_X	  9
+#define SCL_Y	  10
+#define SCL_Z	  11
+#define COL_R	  12
+#define COL_G	  13
+#define COL_B	  14
+#define DENSITY	  15
+
 /* Private Enumerations and Structures */
 
 using namespace object;
@@ -42,198 +58,191 @@ Object::Object() {}
 
 Object::~Object() {}
 
-void Object::load(string objectData) {
+// void Object::load(string objectData) {
 
-	// Objects are stored in following format O,shaderId,filePath,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl
-	// Split the string by delimiter to extract data
+// 	// Objects are stored in following format
+// 	// O,shaderId,filePath,xPos,yPos,zPos,xRot,yRot,zRot,xScl,yScl,zScl,r,g,b,density Split the string by delimiter to
+// 	// extract data
 
-	string data[12];
-	strUtils.split_string(objectData, data, 0, ',');
+// 	string data[16];
+// 	StrUtils::split_string(objectData, data, 0, ',');
 
-	// Load the object
-	const int i		   = 1;
-	this->loadShaderId = atoi(data[i].c_str());
-	cout << "loading model: ../Resources/Models/" << data[i + 1] << endl;
-	load_mesh("../Resources/Models/" + data[i + 1], this);
+// 	// Load the object
+// 	this->loadShaderId = atoi(data[SHADER_ID].c_str());
 
-	// Set the initial position of this object
-	this->position.set(stof(data[i + 2]), stof(data[i + 3]), stof(data[i + 4]));
-	this->rotation.set(stof(data[i + 5]), stof(data[i + 6]), stof(data[i + 7]));
-	this->scale.set(stof(data[i + 8]), stof(data[i + 9]), stof(data[i + 10]));
-}
+// 	// Load the colour early so the data can be stored into the vbo
+// 	this->colour.set(stof(data[COL_R]), stof(data[COL_G]), stof(data[COL_B]));
+// 	// cout << colour.x() << " " << colour.y() << " " << colour.z() << "\n";
 
-void Object::load_mesh(string filePath, Entity* entity) {
+// 	// load_mesh("../Resources/Models/" + data[FILE_PATH], this);
 
-	// Confirm given file path exists
-	std::ifstream objFile(filePath);
+// 	// Set the initial position of this object
+// 	this->position.set(stof(data[POS_X]), stof(data[POS_Y]), stof(data[POS_Z]));
+// 	this->rotation.set(stof(data[ROT_X]), stof(data[ROT_Y]), stof(data[ROT_Z]));
+// 	this->scale.set(stof(data[SCL_X]), stof(data[SCL_Y]), stof(data[SCL_Z]));
 
-	if (objFile.is_open() != true) {
-		log.log_error("Could not open file to load 3D object");
-		cout << filePath << endl;
-		return;
-	}
+// 	this->density = stof(data[DENSITY]);
 
-	int numVertices = 0;
-	int numFaces	= 0;
-	string line;
+// 	// Calcualte the mass of the object
+// 	this->mass = this->density * this->volume;
+// }
 
-	// Calculate the number of vertices and faces the object has
-	while (getline(objFile, line)) {
+// void Object::load_mesh(string filePath, Entity* entity) {
 
-		if (VERTEX_DATA(line)) {
-			numVertices++;
-		}
+// 	// Confirm given file path exists
+// 	std::ifstream objFile(filePath);
 
-		if (FACE_DATA(line)) {
-			numFaces++;
-		}
-	}
+// 	if (objFile.is_open() != true) {
+// 		log.log_error("Could not open file to load 3D object");
+// 		cout << filePath << endl;
+// 		return;
+// 	}
 
-	// Go back to the start of the objFile
-	objFile.clear();
-	objFile.seekg(0);
+// 	int numVertices = 0;
+// 	int numFaces	= 0;
+// 	string line;
 
-	/****** START CODE BLOCK ******/
-	// Description: // Create arrays and array indexs for each type of data to be extracted
+// 	// Calculate the number of vertices and faces the object has
+// 	while (getline(objFile, line)) {
 
-	// List for all vertecies of object. Multiply by 6 because V = x, y, z, r, g, b
-	float vertexData[numVertices * 6];
-	int vdi = 0;
+// 		if (VERTEX_DATA(line)) {
+// 			numVertices++;
+// 		}
 
-	// List of elements so OpenGL knows which order the vertecies should be connected
-	entity->eboSize = numFaces * 3;
-	int elementData[entity->eboSize];
-	int edi = 0;
+// 		if (FACE_DATA(line)) {
+// 			numFaces++;
+// 		}
+// 	}
 
-	/****** END CODE BLOCK ******/
+// 	// Go back to the start of the objFile
+// 	objFile.clear();
+// 	objFile.seekg(0);
 
-	Vector3f* vertices;
-	Vector3i* vertexConnectionList;
-	vertices			 = new Vector3f[numVertices];
-	vertexConnectionList = new Vector3i[numFaces];
-	int vi				 = 0;
-	int vcli			 = 0;
+// 	/****** START CODE BLOCK ******/
+// 	// Description: // Create arrays and array indexs for each type of data to be extracted
 
-	// Values for calculating bounding box. Setting values to reasonable min and max values
-	// For super large objects, these may need to be adjust
-	float minX = 1000000;
-	float minY = 1000000;
-	float minZ = 1000000;
-	float maxX = -1000000;
-	float maxY = -1000000;
-	float maxZ = -1000000;
+// 	// List for all vertecies of object. Multiply by 6 because V = x, y, z, r, g, b
+// 	float vertexData[numVertices * 6];
+// 	int vdi = 0;
 
-	// Store data into the arrays that were just created
-	while (getline(objFile, line)) {
+// 	// List of elements so OpenGL knows which order the vertecies should be connected
+// 	entity->eboSize = numFaces * 3;
+// 	int elementData[entity->eboSize];
+// 	int edi = 0;
 
-		if (VERTEX_DATA(line)) {
-			string vertex[3];
-			strUtils.split_string(line, vertex, 2, ' ');
+// 	/****** END CODE BLOCK ******/
 
-			float vx = stof(vertex[0]);
-			float vy = stof(vertex[1]);
-			float vz = stof(vertex[2]);
+// 	Vector3f* vertices;
+// 	Vector3i* vertexConnectionList;
+// 	vertices			 = new Vector3f[numVertices];
+// 	vertexConnectionList = new Vector3i[numFaces];
+// 	int vi				 = 0;
+// 	int vcli			 = 0;
 
-			vertexData[vdi++] = vx;
-			vertexData[vdi++] = vy;
-			vertexData[vdi++] = vz;
+// 	// Values for calculating bounding box. Setting values to reasonable min and max values
+// 	// For super large objects, these may need to be adjust
+// 	float minX = 1000000;
+// 	float minY = 1000000;
+// 	float minZ = 1000000;
+// 	float maxX = -1000000;
+// 	float maxY = -1000000;
+// 	float maxZ = -1000000;
 
-			// Test code here
-			vertices[vi].set(vx, vy, vz);
-			vi++;
-			// Test code here
+// 	// Store data into the arrays that were just created
+// 	while (getline(objFile, line)) {
 
-			// Adding a default colour to the objects for the moment
-			vertexData[vdi++] = 0.5;
-			vertexData[vdi++] = 0.5;
-			vertexData[vdi++] = 0.5;
+// 		if (VERTEX_DATA(line)) {
+// 			string vertex[3];
+// 			strUtils.split_string(line, vertex, 2, ' ');
 
-			// CODE FOR CALCULATING THE BOUNDING BOX
-			if (vx < minX) {
-				minX = vx;
-			}
-			if (vy < minY) {
-				minY = vy;
-			}
-			if (vz < minZ) {
-				minZ = vz;
-			}
+// 			float vx = stof(vertex[0]);
+// 			float vy = stof(vertex[1]);
+// 			float vz = stof(vertex[2]);
 
-			if (vx > maxX) {
-				maxX = vx;
-			}
-			if (vy > maxY) {
-				maxY = vy;
-			}
-			if (vz > maxZ) {
-				maxZ = vz;
-			}
+// 			vertexData[vdi++] = vx;
+// 			vertexData[vdi++] = vy;
+// 			vertexData[vdi++] = vz;
 
-			// CODE FOR CALCULATING THE BOUNDING BOX
-		}
+// 			// Test code here
+// 			vertices[vi].set(vx, vy, vz);
+// 			vi++;
+// 			// Test code here
 
-		if (FACE_DATA(line)) {
+// 			// Adding a default colour to the objects for the moment
+// 			// cout << "vd[" << vdi << "] = " << entity->colour.x() << endl;
+// 			vertexData[vdi++] = entity->colour.x();
+// 			// cout << "vd[" << vdi << "] = " << entity->colour.y() << endl;
+// 			vertexData[vdi++] = entity->colour.y();
+// 			// cout << "vd[" << vdi << "] = " << entity->colour.z() << endl;
+// 			vertexData[vdi++] = entity->colour.z();
 
-			string edges[3];
-			strUtils.split_string(line, edges, 2, ' ');
+// 			// CODE FOR CALCULATING THE BOUNDING BOX
+// 			if (vx < minX) {
+// 				minX = vx;
+// 			}
+// 			if (vy < minY) {
+// 				minY = vy;
+// 			}
+// 			if (vz < minZ) {
+// 				minZ = vz;
+// 			}
 
-			// Loop through each split to extract the element data
-			for (int i = 0; i < 3; i++) {
+// 			if (vx > maxX) {
+// 				maxX = vx;
+// 			}
+// 			if (vy > maxY) {
+// 				maxY = vy;
+// 			}
+// 			if (vz > maxZ) {
+// 				maxZ = vz;
+// 			}
 
-				string faceData[3];
-				strUtils.split_string(edges[i], faceData, 0, '/');
-				elementData[edi++] = stoi(faceData[0]) - 1;
+// 			// CODE FOR CALCULATING THE BOUNDING BOX
+// 		}
 
-				// test code
-				if (i == 0) {
-					vertexConnectionList[vcli].set_x(stoi(faceData[0]) - 1);
-				} else if (i == 1) {
-					vertexConnectionList[vcli].set_y(stoi(faceData[0]) - 1);
-				} else {
-					vertexConnectionList[vcli].set_z(stoi(faceData[0]) - 1);
-				}
-				// test code
-			}
+// 		if (FACE_DATA(line)) {
 
-			// test code
-			vcli++;
-			// test code
-		}
-	}
+// 			string edges[3];
+// 			strUtils.split_string(line, edges, 2, ' ');
 
-	// Compute the volume
-	entity->volume = Algorithms::compute_volume(vertices, vertexConnectionList, numFaces);
-	cout << minX << " " << minX << " " << minY << " " << minZ << " " << maxX << " " << maxY << " " << maxZ << " "
-		 << endl;
-	entity->boundingBox.set(minX, minY, minZ, maxX, maxY, maxZ);
+// 			// Loop through each split to extract the element data
+// 			for (int i = 0; i < 3; i++) {
 
-	// entity->boundingBox[0].set(minX, minY, minZ);
-	// entity->boundingBox[1].set(minX, minY, maxZ);
-	// entity->boundingBox[2].set(minX, maxY, minZ);
-	// entity->boundingBox[3].set(minX, maxY, maxZ);
-	// entity->boundingBox[4].set(maxX, minY, minZ);
-	// entity->boundingBox[5].set(maxX, minY, maxZ);
-	// entity->boundingBox[6].set(maxX, maxY, minZ);
-	// entity->boundingBox[7].set(maxX, maxY, maxZ);
+// 				string faceData[3];
+// 				strUtils.split_string(edges[i], faceData, 0, '/');
+// 				elementData[edi++] = stoi(faceData[0]) - 1;
 
-	// Creating the faces of the bounding boxes. Each vector contains
-	// three indexes which correspond to vertecies in the bounding
-	// box array
-	// entity->boundingBoxFaces[0].set(0, 4, 2); // Face 0
-	// entity->boundingBoxFaces[0].set(4, 7, 6); // Face 1
-	// entity->boundingBoxFaces[0].set(7, 3, 5); // Face 2
-	// entity->boundingBoxFaces[0].set(3, 0, 2); // Face 3
-	// entity->boundingBoxFaces[0].set(0, 4, 5); // Face 4
-	// entity->boundingBoxFaces[0].set(2, 6, 7); // Face 5
+// 				// test code
+// 				if (i == 0) {
+// 					vertexConnectionList[vcli].set_x(stoi(faceData[0]) - 1);
+// 				} else if (i == 1) {
+// 					vertexConnectionList[vcli].set_y(stoi(faceData[0]) - 1);
+// 				} else {
+// 					vertexConnectionList[vcli].set_z(stoi(faceData[0]) - 1);
+// 				}
+// 				// test code
+// 			}
 
-	// Bind the vbo for this mesh to make them active
-	glBindBuffer(GL_ARRAY_BUFFER, entity->vbo);
+// 			// test code
+// 			vcli++;
+// 			// test code
+// 		}
+// 	}
 
-	// Store vertex data into the current active vertex buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
+// 	// Compute the volume
+// 	entity->volume = Algorithms::compute_volume(vertices, vertexConnectionList, numFaces);
+// 	entity->boundingBox.set(minX, minY, minZ, maxX, maxY, maxZ);
 
-	// Bind the element buffer for this object to make it active
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, entity->ebo);
-	// Store element data into the current active element buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elementData), elementData, GL_STATIC_DRAW);
-}
+// 	// Bind the vbo for this mesh to make them active
+// 	cout << "Binding VBO: " << entity->vbo << " and ebo " << entity->ebo << endl;
+// 	glBindBuffer(GL_ARRAY_BUFFER, entity->vbo);
+
+// 	// Store vertex data into the current active vertex buffer
+// 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
+
+// 	// Bind the element buffer for this object to make it active
+// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, entity->ebo);
+
+// 	// Store element data into the current active element buffer
+// 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elementData), elementData, GL_STATIC_DRAW);
+// }

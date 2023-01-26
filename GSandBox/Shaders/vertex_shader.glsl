@@ -3,10 +3,6 @@
 in vec3 position;
 in vec3 colour;
 
-// uniform vec3 translation;
-// uniform vec3 scale;
-// uniform vec4 rotate;
-
 uniform vec3 cameraRotation;
 uniform vec3 cameraPosition;
 uniform mat4 transformationMatrix;
