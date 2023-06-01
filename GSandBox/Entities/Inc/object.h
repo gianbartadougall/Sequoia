@@ -36,7 +36,6 @@ namespace object {
 		// Private variables
 
 		public:
-
 		Object();
 		~Object();
 		// void load(string objectData);
